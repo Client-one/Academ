@@ -2,8 +2,8 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { signInStudent } from "@/lib/security/student-auth";
 import { clientKey, rateLimit } from "@/lib/security/rate-limit";
 import { adminLoginSchema, studentLoginSchema } from "@/lib/validation/schemas";
 
@@ -27,29 +27,18 @@ export async function studentLogin(
 
   const headerList = await headers();
   const ip = headerList.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
-  const uid = String(formData.get("university_id")).trim();
+  const uid = parsed.data.university_id;
 
   // Defense in depth on top of Supabase Auth rate limiting.
   if (!rateLimit(clientKey("student-login", uid, ip), 8, 10 * 60_000)) {
     return { error: "محاولات كثيرة. حاول مرة أخرى بعد قليل." };
   }
 
-  // Private lookup: university number → internal auth email (service role only,
-  // never exposed to the browser). Same generic error whether missing/inactive.
-  const admin = createAdminClient();
-  const { data: internalEmail, error: lookupError } = await admin.rpc("student_auth_email", {
-    p_university_id: uid,
-  });
-  if (lookupError || !internalEmail || typeof internalEmail !== "string") {
-    return { error: GENERIC_AUTH_ERROR };
-  }
-
+  // Private lookup + sign-in (see lib/security/student-auth.ts). The internal
+  // email stays on the server; every failure yields the same generic error.
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({
-    email: internalEmail,
-    password: parsed.data.password,
-  });
-  if (error) {
+  const result = await signInStudent(supabase, parsed.data.university_id, parsed.data.password);
+  if (!result.ok) {
     return { error: GENERIC_AUTH_ERROR };
   }
 

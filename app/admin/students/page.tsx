@@ -1,5 +1,6 @@
 import { ActionForm } from "@/components/action-form";
 import { ConfirmButton } from "@/components/confirm-button";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -25,7 +26,15 @@ export default async function AdminStudentsPage({
   const { supabase } = await requireAdmin();
   const sp = await searchParams;
   const page = Math.max(0, Number(sp.page ?? 0) || 0);
-  const { students, count } = await listStudents(supabase, { page, search: sp.q });
+  let students: Awaited<ReturnType<typeof listStudents>>["students"] = [];
+  let count = 0;
+  let loadError: string | null = null;
+  try {
+    ({ students, count } = await listStudents(supabase, { page, search: sp.q }));
+  } catch (e) {
+    // listStudents already logged the details; show a safe message only.
+    loadError = e instanceof Error ? e.message : "تعذر تحميل قائمة الطلاب.";
+  }
   const semesters = await listSemesters(supabase);
   const editing = students.find((s) => s.id === sp.edit);
 
@@ -61,7 +70,9 @@ export default async function AdminStudentsPage({
         <Button type="submit" variant="secondary">بحث</Button>
       </form>
 
-      {students.length === 0 ? (
+      {loadError ? (
+        <Alert kind="error">{loadError} حاول مرة أخرى، وإن استمرت المشكلة راجع سجلات الخادم.</Alert>
+      ) : students.length === 0 ? (
         <EmptyState title="لا يوجد طلاب" />
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-ink-100 bg-white shadow-card">

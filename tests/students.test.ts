@@ -55,8 +55,12 @@ function makeSessionClient(opts: {
                 error: null,
               }),
             }),
+            in: async () => ({ data: [], error: null }),
           }),
         };
+      }
+      if (table === "levels") {
+        return { select: () => ({ in: async () => ({ data: [], error: null }) }) };
       }
       throw new Error(`unexpected table: ${table}`);
     },
@@ -77,6 +81,23 @@ describe("listStudents", () => {
     const { client } = makeSessionClient({ eqCalls });
     await listStudents(client, { page: 0, search: "أحمد" });
     expect(eqCalls).toContainEqual({ column: "role", value: "student" });
+  });
+});
+
+describe("listStudents (regression: ambiguous embed)", () => {
+  it("never uses a PostgREST embed on profiles (two FKs to semesters => PGRST201)", async () => {
+    let selectArg = "";
+    const builder: Record<string, unknown> = {};
+    builder.select = (cols: string) => ((selectArg = cols), builder);
+    builder.eq = () => builder;
+    builder.or = () => builder;
+    builder.order = () => builder;
+    builder.range = () => builder;
+    builder.then = (resolve: (v: unknown) => void) =>
+      Promise.resolve({ data: [], count: 0, error: null }).then(resolve);
+    const client = { from: () => builder } as unknown as SupabaseClient;
+    await listStudents(client, { page: 0 });
+    expect(selectArg).not.toMatch(/semesters|levels|\(/);
   });
 });
 

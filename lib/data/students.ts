@@ -90,12 +90,14 @@ export async function listStudents(
   options: { page: number; search?: string }
 ): Promise<{ students: (Profile & { level_name: string | null; semester_name: string | null })[]; count: number }> {
   const pageSize = 25;
+  // NOTE: no PostgREST embed (`semesters(name)`) here. profiles has TWO
+  // foreign keys to semesters (semester_id and the composite
+  // (semester_id, level_id)), so the embed is ambiguous and PostgREST fails
+  // the whole request with PGRST201 — the list then never rendered. Names are
+  // resolved with two small explicit lookups instead.
   let query = adminClient
     .from("profiles")
-    .select(
-      "*, semesters(name), levels(name)",
-      { count: "exact" }
-    )
+    .select("*", { count: "exact" })
     // Server-side guarantee: admin accounts never enter the student list —
     // not the rows, not the count, not search results or pagination.
     .eq("role", "student")
@@ -110,20 +112,77 @@ export async function listStudents(
 
   const { data, count, error } = await query;
   if (error) {
-    logError("students_list_failed", { message: error.message });
+    logError("students_list_failed", { code: error.code, message: error.message });
     throw new Error("تعذر تحميل قائمة الطلاب.");
   }
-  const students = (data ?? []).map((row: Record<string, unknown>) => {
-    const semesters = row.semesters as { name: string } | null;
-    const levels = row.levels as { name: string } | null;
-    const { semesters: _s, levels: _l, ...profile } = row;
-    return {
-      ...(profile as unknown as Profile),
-      level_name: levels?.name ?? null,
-      semester_name: semesters?.name ?? null,
-    };
-  });
+  const rows = (data ?? []) as unknown as Profile[];
+
+  const semesterIds = [...new Set(rows.map((r) => r.semester_id).filter((v): v is string => !!v))];
+  const levelIds = [...new Set(rows.map((r) => r.level_id).filter((v): v is string => !!v))];
+  const semesterNames = new Map<string, string>();
+  const levelNames = new Map<string, string>();
+
+  if (semesterIds.length > 0) {
+    const res = await adminClient.from("semesters").select("id, name").in("id", semesterIds);
+    if (res.error) {
+      logError("students_list_semesters_failed", { code: res.error.code, message: res.error.message });
+      throw new Error("تعذر تحميل قائمة الطلاب.");
+    }
+    for (const r of (res.data ?? []) as { id: string; name: string }[]) semesterNames.set(r.id, r.name);
+  }
+  if (levelIds.length > 0) {
+    const res = await adminClient.from("levels").select("id, name").in("id", levelIds);
+    if (res.error) {
+      logError("students_list_levels_failed", { code: res.error.code, message: res.error.message });
+      throw new Error("تعذر تحميل قائمة الطلاب.");
+    }
+    for (const r of (res.data ?? []) as { id: string; name: string }[]) levelNames.set(r.id, r.name);
+  }
+
+  const students = rows.map((row) => ({
+    ...row,
+    level_name: (row.level_id && levelNames.get(row.level_id)) || null,
+    semester_name: (row.semester_id && semesterNames.get(row.semester_id)) || null,
+  }));
   return { students, count: count ?? 0 };
+}
+
+/**
+ * Private lookup: university number → internal Auth email. SERVER-ONLY,
+ * service role (profiles is RLS-protected and the caller is anonymous).
+ * Returns null for unknown / inactive / non-student / any failure, so the
+ * caller can answer with ONE generic error. The email never leaves the server.
+ *
+ * Replaces the old `rpc("student_auth_email")`: that function lives in the
+ * non-exposed `app_private` schema (and service_role was never granted USAGE
+ * on it), so PostgREST could never resolve the call and every login failed
+ * with the generic error.
+ */
+export async function findStudentAuthEmail(universityId: string): Promise<string | null> {
+  const admin = createAdminClient();
+  const { data: rows, error } = await admin
+    .from("profiles")
+    .select("id")
+    .eq("role", "student")
+    .eq("is_active", true)
+    .eq("university_id", universityId)
+    .limit(2);
+  if (error) {
+    logError("student_lookup_failed", { code: error.code, message: error.message });
+    return null;
+  }
+  // The partial unique index guarantees at most one active match; refuse to
+  // guess if that invariant is ever broken.
+  if (!rows || rows.length !== 1) return null;
+
+  const { data: authData, error: authError } = await admin.auth.admin.getUserById(
+    (rows[0] as { id: string }).id
+  );
+  if (authError || !authData?.user?.email) {
+    logError("student_lookup_auth_failed", { message: authError?.message });
+    return null;
+  }
+  return authData.user.email;
 }
 
 /** Deactivate = deny future protected operations immediately (Auth ban). */
