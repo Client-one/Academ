@@ -108,3 +108,25 @@ values ('<PASTE_UUID_HERE>', 'المدير العام', 'admin');
   migration did not run fully.
 - **Upload fails** → bucket missing/private policy issue; check the migration
   applied and Storage shows `content-files` as private.
+
+
+## Upload size limits (material files)
+
+Files are uploaded through a Server Action, so three limits apply and the
+SMALLEST one wins:
+
+| Layer | Limit | Where |
+|---|---|---|
+| Next.js Server Action body | 1 MB default → set to 4.25 MB | `next.config.ts` (`experimental.serverActions.bodySizeLimit`) |
+| Vercel Function request body | 4.5 MB (hard, not configurable; 413 `FUNCTION_PAYLOAD_TOO_LARGE`) | Vercel platform |
+| Application | 4,000,000 bytes per file | `MAX_SERVER_UPLOAD_BYTES` in `lib/security/file-validation.ts` |
+
+Raising `bodySizeLimit` alone does NOT allow larger files on Vercel. The 20 MB
+policy ceiling (`MAX_FILE_BYTES`) needs a direct-to-Storage upload path
+(browser → Supabase signed upload URL), which is not implemented.
+
+Upload order: the file is uploaded to Storage first, then the
+`content_materials` row is inserted once as `ready` (no row-delete rollback is
+needed; the table has no DELETE policy). If the insert fails the object is
+removed and the removal is verified; an object that cannot be removed is logged
+as `material_orphan_file_cleanup_failed` for manual cleanup.

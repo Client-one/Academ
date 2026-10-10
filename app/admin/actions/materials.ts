@@ -3,7 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/security/guards";
 import { attachArticle, updateMaterialMetadata, uploadMaterialFile } from "@/lib/data/materials";
+import { MAX_SERVER_UPLOAD_BYTES } from "@/lib/security/file-validation";
+import { logError } from "@/lib/security/logger";
 import { materialSchema, materialUpdateSchema, type ActionResult } from "@/lib/validation/schemas";
+
+function formatMb(bytes: number): string {
+  return (bytes / 1_000_000).toString();
+}
 
 export async function uploadMaterialAction(formData: FormData): Promise<ActionResult> {
   const { supabase, profile } = await requireAdmin();
@@ -20,15 +26,29 @@ export async function uploadMaterialAction(formData: FormData): Promise<ActionRe
     return { error: "اختر ملفاً للرفع." };
   }
 
-  const result = await uploadMaterialFile({
-    client: supabase,
-    contentItemId: parsed.data.content_item_id,
-    materialKindId: parsed.data.material_kind_id,
-    title: parsed.data.title,
-    description: parsed.data.description,
-    file,
-    adminProfileId: profile.id,
-  });
+  // Effective limit of the Server Action path (see MAX_SERVER_UPLOAD_BYTES).
+  if (file.size > MAX_SERVER_UPLOAD_BYTES) {
+    return {
+      error: `حجم الملف يتجاوز الحد الحالي للرفع (${formatMb(MAX_SERVER_UPLOAD_BYTES)} ميغابايت). قلّل حجم الملف.`,
+    };
+  }
+
+  let result;
+  try {
+    result = await uploadMaterialFile({
+      client: supabase,
+      contentItemId: parsed.data.content_item_id,
+      materialKindId: parsed.data.material_kind_id,
+      title: parsed.data.title,
+      description: parsed.data.description,
+      file,
+      adminProfileId: profile.id,
+    });
+  } catch (e) {
+    // Never leak internals; details go to the server log only.
+    logError("material_upload_unexpected", { message: e instanceof Error ? e.message : String(e) });
+    return { error: "حدث خطأ غير متوقع أثناء الرفع. حاول مرة أخرى." };
+  }
   if (!result.ok) return { error: result.error };
 
   revalidatePath("/admin/materials");

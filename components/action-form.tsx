@@ -15,15 +15,34 @@ export function ActionForm({
   children,
   submitLabel = "حفظ",
   className = "",
+  maxFileBytes,
 }: {
   action: FormAction;
   children: ReactNode;
   submitLabel?: string;
   className?: string;
+  /** Optional client-side guard so an oversize file is rejected before upload. */
+  maxFileBytes?: number;
 }) {
   const [state, formAction, pending] = useActionState(
-    async (_prev: { error?: string; success?: string }, formData: FormData) =>
-      (await action(formData)) ?? {},
+    async (_prev: { error?: string; success?: string }, formData: FormData) => {
+      if (maxFileBytes) {
+        for (const value of formData.values()) {
+          if (value instanceof File && value.size > maxFileBytes) {
+            return { error: `حجم الملف يتجاوز الحد المسموح (${maxFileBytes / 1_000_000} ميغابايت).` };
+          }
+        }
+      }
+      try {
+        return (await action(formData)) ?? {};
+      } catch (e) {
+        // Framework-level failures (e.g. request body too large) throw before
+        // the action runs; show a safe message instead of the error page.
+        const digest = (e as { digest?: string } | null)?.digest;
+        if (typeof digest === "string" && digest.startsWith("NEXT_")) throw e; // redirect/notFound
+        return { error: "تعذر إتمام العملية. إذا كنت ترفع ملفًا فقد يكون حجمه أكبر من المسموح؛ جرّب ملفًا أصغر." };
+      }
+    },
     {}
   );
 

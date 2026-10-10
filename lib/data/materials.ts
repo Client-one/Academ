@@ -1,4 +1,5 @@
 import "server-only";
+import { randomUUID } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { parseArticle, type Article } from "@/lib/articles/schema";
 import {
@@ -9,6 +10,8 @@ import {
 } from "@/lib/security/file-validation";
 import { articleUploadSchema } from "@/lib/validation/schemas";
 import { logError } from "@/lib/security/logger";
+import { insertWithNextOrderIndex, type DbError } from "@/lib/data/ordering";
+import { describeDbInsertError, describeStorageError } from "@/lib/data/upload-errors";
 import { isConsistentUploadState, isStudentVisibleState } from "@/lib/data/upload-state";
 import type { ContentMaterial, Status } from "@/lib/types";
 
@@ -112,8 +115,21 @@ export type UploadResult = { ok: true; materialId: string } | { ok: false; error
 
 /**
  * Upload a file material using the ADMIN SESSION + Storage RLS policies
- * (no service role). Safe two-phase commit: insert row → upload file →
- * update path; on failure, clean up both sides.
+ * (no service role).
+ *
+ * Order of operations (chosen so that NO step ever needs to DELETE a
+ * content_materials row — the table has no DELETE policy, so a row-delete
+ * rollback silently affects 0 rows and would leave an orphan "pending" row):
+ *
+ *   1. Validate bytes / kind / parents (nothing written yet).
+ *   2. Upload the object to a path built from a freshly generated material id.
+ *      Failure here => nothing exists anywhere; just report.
+ *   3. Insert the finished row in ONE statement (storage_path set,
+ *      upload_status 'ready', status 'draft') with a safe order_index.
+ *      Failure here => remove the uploaded object and VERIFY the removal
+ *      (Storage returns the removed objects; an empty list means RLS/other
+ *      denial, not success). An object that could not be removed is logged
+ *      as an orphan for manual cleanup — never silently.
  */
 export async function uploadMaterialFile(params: {
   client: SupabaseClient; // admin-session client
@@ -130,88 +146,112 @@ export async function uploadMaterialFile(params: {
   const detected = check.kind as DetectedKind;
 
   // Ownership: the content item must exist (RLS admin read) and belong to a real course.
-  const { data: item } = await params.client
+  const { data: item, error: itemError } = await params.client
     .from("content_items")
     .select("id, course_id")
     .eq("id", params.contentItemId)
     .maybeSingle();
+  if (itemError) {
+    logError("material_item_lookup_failed", { code: itemError.code, message: itemError.message });
+    return { ok: false, error: "تعذر التحقق من محور المحتوى. حاول مرة أخرى." };
+  }
   if (!item) return { ok: false, error: "عنوان المحتوى غير موجود." };
 
   // material_kind ↔ file-type consistency: the chosen kind code (from the
   // client) must accept the file's DETECTED signature, so a tampered client
   // cannot upload e.g. an image under a "PDF" kind.
-  const { data: kindRow } = await params.client
+  const { data: kindRow, error: kindError } = await params.client
     .from("material_kinds")
     .select("code")
     .eq("id", params.materialKindId)
     .maybeSingle();
+  if (kindError) {
+    logError("material_kind_lookup_failed", { code: kindError.code, message: kindError.message });
+    return { ok: false, error: "تعذر التحقق من نوع المادة. حاول مرة أخرى." };
+  }
   if (!kindRow) return { ok: false, error: "نوع المادة غير موجود." };
   if (!fileKindAllowedForMaterialKind((kindRow as { code: string }).code, detected)) {
     return { ok: false, error: "نوع الملف لا يتوافق مع نوع المادة المحدد." };
   }
 
-  // Phase 1 — create the DB record in an explicit pending state.
-  // storage_path stays NULL (never a "pending" placeholder string) and the
-  // row is forced to draft by the lifecycle CHECK until the upload finishes.
+  // The extension was validated against the allowlist by validateUpload.
   const ext = params.file.name.split(".").pop()!.toLowerCase();
-  const { data: created, error: insertError } = await params.client
-    .from("content_materials")
-    .insert({
-      content_item_id: params.contentItemId,
-      material_kind_id: params.materialKindId,
-      title: params.title,
-      description: params.description,
-      storage_path: null,
-      upload_status: "pending",
-      status: "draft",
-      created_by: params.adminProfileId,
-    })
-    .select("id")
-    .single();
+  const materialId = randomUUID();
+  const storagePath = `${(item as { course_id: string }).course_id}/${params.contentItemId}/${materialId}.${ext}`;
 
-  if (insertError || !created) {
-    logError("material_record_create_failed", { message: insertError?.message });
-    return { ok: false, error: "تعذر إنشاء سجل المادة." };
-  }
-
-  const materialId = (created as { id: string }).id;
-  const storagePath = `${item.course_id}/${params.contentItemId}/${materialId}.${ext}`;
-
-  // Phase 2 — upload to private Storage. On failure: delete the DB record so
-  // no incomplete material remains (no orphan row, no file was stored).
-  const { error: uploadError } = await params.client.storage
+  // Step 2 — upload the object (nothing in the DB yet).
+  const { data: uploaded, error: uploadError } = await params.client.storage
     .from("content-files")
     .upload(storagePath, bytes, { contentType: mimeForKind(detected), upsert: false });
-
-  if (uploadError) {
-    await params.client.from("content_materials").delete().eq("id", materialId);
-    logError("material_upload_failed", { message: uploadError.message });
-    return { ok: false, error: "فشل رفع الملف. لم يتم حفظ أي سجل." };
+  if (uploadError || !uploaded) {
+    logError("material_upload_failed", {
+      materialId,
+      status: (uploadError as { statusCode?: string } | null)?.statusCode,
+      message: uploadError?.message,
+    });
+    return { ok: false, error: describeStorageError(uploadError ?? {}) };
   }
 
-  // Phase 3 — finalize the record. On failure: remove the uploaded file
-  // (no orphan object) AND delete the record (no half-complete material).
-  const { data: finalized, error: updateError } = await params.client
-    .from("content_materials")
-    .update({ storage_path: storagePath, upload_status: "ready" })
-    .eq("id", materialId)
-    .eq("upload_status", "pending")
-    .select("id");
+  // Step 3 — one atomic insert of the finished record.
+  const inserted = await insertWithNextOrderIndex<{ id: string }>({
+    client: params.client,
+    table: "content_materials",
+    parentColumn: "content_item_id",
+    parentId: params.contentItemId,
+    insert: (orderIndex) =>
+      params.client
+        .from("content_materials")
+        .insert({
+          id: materialId,
+          content_item_id: params.contentItemId,
+          material_kind_id: params.materialKindId,
+          title: params.title,
+          description: params.description,
+          storage_path: storagePath,
+          upload_status: "ready",
+          status: "draft",
+          order_index: orderIndex,
+          created_by: params.adminProfileId,
+        })
+        .select("id")
+        .single() as unknown as PromiseLike<{ data: { id: string } | null; error: DbError | null }>,
+  });
 
-  if (updateError || !finalized || finalized.length === 0) {
-    const { error: cleanupError } = await params.client.storage
-      .from("content-files")
-      .remove([storagePath]);
-    if (cleanupError) {
-      // Orphaned object — record it for manual cleanup, never silently.
-      logError("material_orphan_file_cleanup_failed", { message: cleanupError.message });
-    }
-    await params.client.from("content_materials").delete().eq("id", materialId);
-    if (updateError) logError("material_finalize_failed", { message: updateError.message });
-    return { ok: false, error: "تعذر حفظ بيانات الملف. تم التراجع عن الرفع بالكامل." };
+  if (inserted.error || !inserted.data) {
+    logError("material_record_create_failed", {
+      materialId,
+      attempts: inserted.attempts,
+      code: inserted.error?.code,
+      message: inserted.error?.message,
+    });
+    await removeUploadedObject(params.client, storagePath, materialId);
+    return {
+      ok: false,
+      error: describeDbInsertError(inserted.error ?? {}) + " لم يُحفظ الملف.",
+    };
   }
 
   return { ok: true, materialId };
+}
+
+/** Removes an uploaded object and verifies it actually went away. */
+async function removeUploadedObject(
+  client: SupabaseClient,
+  storagePath: string,
+  materialId: string
+): Promise<boolean> {
+  const { data: removed, error } = await client.storage.from("content-files").remove([storagePath]);
+  if (error || !removed || removed.length !== 1) {
+    // Orphaned object: either the call failed or Storage removed nothing
+    // (e.g. policy denial returns an empty list, not an error).
+    logError("material_orphan_file_cleanup_failed", {
+      materialId,
+      removedCount: removed?.length ?? 0,
+      message: error?.message,
+    });
+    return false;
+  }
+  return true;
 }
 
 /**

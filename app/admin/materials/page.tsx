@@ -16,6 +16,7 @@ import {
 } from "@/app/admin/actions/materials";
 import { listMaterialKinds, listMaterials, resolveAdminHierarchy } from "@/lib/data/academics";
 import { requireAdmin } from "@/lib/security/guards";
+import { MAX_SERVER_UPLOAD_BYTES } from "@/lib/security/file-validation";
 
 export default async function AdminMaterialsPage({
   searchParams,
@@ -63,7 +64,7 @@ export default async function AdminMaterialsPage({
         <>
           <Card className="mb-6">
             <CardTitle className="mb-4">رفع مادة جديدة</CardTitle>
-            <ActionForm action={uploadMaterialAction} submitLabel="رفع الملف">
+            <ActionForm action={uploadMaterialAction} submitLabel="رفع الملف" maxFileBytes={MAX_SERVER_UPLOAD_BYTES}>
               <input type="hidden" name="content_item_id" value={itemId} />
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="نوع المادة">
@@ -75,7 +76,7 @@ export default async function AdminMaterialsPage({
                 </Field>
                 <Field label="العنوان"><Input name="title" required /></Field>
                 <Field label="الوصف"><Textarea name="description" rows={2} /></Field>
-                <Field label="الملف (PDF/JPG/PNG/WEBP — حد أقصى 20MB)">
+                <Field label={`الملف (PDF/JPG/PNG/WEBP — حد أقصى ${MAX_SERVER_UPLOAD_BYTES / 1_000_000}MB)`}>
                   <Input name="file" type="file" required accept=".pdf,.jpg,.jpeg,.png,.webp" />
                 </Field>
               </div>

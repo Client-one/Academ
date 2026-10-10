@@ -5,7 +5,18 @@
  * signature must exactly match the extension's declared kind.
  */
 
-export const MAX_FILE_BYTES = 20 * 1024 * 1024; // ~20 MB
+export const MAX_FILE_BYTES = 20 * 1024 * 1024; // ~20 MB policy ceiling
+
+/**
+ * Effective ceiling for uploads that travel THROUGH a Server Action.
+ * Vercel Functions reject any request body above 4.5 MB (413
+ * FUNCTION_PAYLOAD_TOO_LARGE) regardless of Next.js settings, and Next's own
+ * Server Action default is 1 MB. 4,000,000 bytes of file + multipart
+ * overhead stays below both the 4.25 MB `bodySizeLimit` in next.config.ts and
+ * Vercel's 4.5 MB. Files up to MAX_FILE_BYTES need a direct-to-Storage upload
+ * path (not implemented yet).
+ */
+export const MAX_SERVER_UPLOAD_BYTES = 4_000_000;
 
 export type DetectedKind = "pdf" | "jpg" | "png" | "webp";
 
