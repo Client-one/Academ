@@ -5,6 +5,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { DownloadLink, hasDownloadableFile } from "@/components/download-link";
 import { listCoursesForSemester } from "@/lib/data/academics";
 import { searchStudentContent } from "@/lib/data/search";
 import { requireStudent } from "@/lib/security/guards";
@@ -73,13 +74,20 @@ export default async function DashboardPage({
                 </Link>
               ))}
               {results.materials.map((m) => (
-                <Link key={m.id} href={`/read/${m.id}`}
-                  className="block rounded-xl border border-ink-100 bg-white p-3 shadow-card hover:border-brand-300">
-                  <span className="font-bold text-ink-900">{m.title}</span>
-                  <span className="mr-2 text-xs text-ink-500">
-                    {MATERIAL_KIND_META[m.kind_code ?? ""]?.label ?? "مادة"}
+                <div key={m.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-ink-100 bg-white p-3 shadow-card">
+                  <span>
+                    <span className="font-bold text-ink-900">{m.title}</span>
+                    <span className="mr-2 text-xs text-ink-500">
+                      {MATERIAL_KIND_META[m.kind_code ?? ""]?.label ?? "مادة"}
+                    </span>
                   </span>
-                </Link>
+                  {hasDownloadableFile(m) ? (
+                    <DownloadLink materialId={m.id} />
+                  ) : (
+                    <span className="text-xs text-ink-500">لا يوجد ملف للتنزيل</span>
+                  )}
+                </div>
               ))}
             </div>
           )}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { DownloadLink, hasDownloadableFile } from "@/components/download-link";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { listMaterials } from "@/lib/data/academics";
@@ -38,7 +39,7 @@ export default async function ContentItemPage({
 
   return (
     <>
-      <PageHeader title={(item as { title: string }).title} subtitle="اختر المادة التي تريد الاطلاع عليها." />
+      <PageHeader title={(item as { title: string }).title} subtitle="نزّل المواد التي تحتاجها من القائمة." />
       {materials.length === 0 ? (
         <EmptyState title="لا توجد مواد منشورة في هذا المحور بعد" />
       ) : (
@@ -46,23 +47,22 @@ export default async function ContentItemPage({
           {materials.map((m) => {
             const meta = MATERIAL_KIND_META[m.kind_code ?? ""];
             return (
-              <Link key={m.id} href={`/read/${m.id}`}>
-                <div className="h-full rounded-2xl border border-ink-100 bg-white p-4 shadow-card transition-colors hover:border-brand-300">
-                  <div className="mb-2 flex items-center justify-between gap-2">
-                    <Badge tone={meta?.badge === "official" ? "official" : "student"}>
-                      {meta?.label ?? "مادة"}
-                    </Badge>
-                    {m.article != null ? (
-                      <Badge tone="published">نسخة للقراءة</Badge>
-                    ) : null}
-                  </div>
-                  <p className="font-bold text-ink-900">{m.title}</p>
-                  {m.description && <p className="mt-1 text-sm text-ink-500">{m.description}</p>}
-                  <p className="mt-3 text-sm font-semibold text-brand-700">
-                    {m.article ? "اقرأ الآن ←" : "افتح الملف ←"}
-                  </p>
+              <div key={m.id} className="flex h-full flex-col rounded-2xl border border-ink-100 bg-white p-4 shadow-card">
+                <div className="mb-2">
+                  <Badge tone={meta?.badge === "official" ? "official" : "student"}>
+                    {meta?.label ?? "مادة"}
+                  </Badge>
                 </div>
-              </Link>
+                <p className="font-bold text-ink-900">{m.title}</p>
+                {m.description && <p className="mt-1 text-sm text-ink-500">{m.description}</p>}
+                <div className="mt-auto pt-3">
+                  {hasDownloadableFile(m) ? (
+                    <DownloadLink materialId={m.id} />
+                  ) : (
+                    <p className="text-sm text-ink-500">لا يوجد ملف للتنزيل حاليًا.</p>
+                  )}
+                </div>
+              </div>
             );
           })}
         </div>

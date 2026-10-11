@@ -31,7 +31,7 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  const studentPaths = ["/dashboard", "/courses", "/read"];
+  const studentPaths = ["/dashboard", "/courses", "/read", "/download"];
   const isStudentPath = studentPaths.some((p) => path.startsWith(p));
   const isAdminPath = path.startsWith("/admin") && !path.startsWith("/admin-login");
 

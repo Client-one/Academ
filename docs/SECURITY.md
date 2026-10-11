@@ -74,3 +74,14 @@
 - No PWA/offline support (future scope per spec).
 - Integration/RLS tests are provided as SQL/unit tests but must be executed
   against a real test Supabase project — they cannot run in CI here.
+
+## Student file downloads
+
+Students only DOWNLOAD files (no in-platform viewer; `/read/<id>` redirects to
+`/courses`). `GET /download/[materialId]` re-checks on the server: signed-in,
+active student, own semester, and a published course → item → material chain
+with a finished upload, then redirects (302, `no-store`) to a 60-second signed
+Storage URL carrying `Content-Disposition: attachment` and a sanitized file
+name. The bucket stays private; no permanent link is ever created or rendered.
+The temporary URL necessarily contains the UUID-only object path and token for
+those 60 seconds. Every refusal returns the same neutral 404.

@@ -1,7 +1,7 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { parseArticle, type Article } from "@/lib/articles/schema";
+import { parseArticle } from "@/lib/articles/schema";
 import {
   validateUpload,
   mimeForKind,
@@ -12,103 +12,103 @@ import { articleUploadSchema } from "@/lib/validation/schemas";
 import { logError } from "@/lib/security/logger";
 import { insertWithNextOrderIndex, type DbError } from "@/lib/data/ordering";
 import { describeDbInsertError, describeStorageError } from "@/lib/data/upload-errors";
-import { isConsistentUploadState, isStudentVisibleState } from "@/lib/data/upload-state";
+import { isConsistentUploadState } from "@/lib/data/upload-state";
 import type { ContentMaterial, Status } from "@/lib/types";
 
-const SIGNED_URL_TTL_SECONDS = 120;
+const SIGNED_URL_TTL_SECONDS = 60;
 
-export type ReadMaterialResult =
-  | {
-      ok: true;
-      material: ContentMaterial;
-      kindCode: string;
-      article: Article | null;
-      fileUrl: string | null;
-    }
+export type DownloadResult =
+  | { ok: true; url: string; filename: string }
   | { ok: false; status: "unauthorized" | "not_found" };
 
+const DOWNLOAD_EXTENSIONS = new Set(["pdf", "jpg", "jpeg", "png", "webp"]);
+
 /**
- * Fetch one material for a STUDENT with full chain authorization
- * (published course+item+material, and the course must belong to the
- * student's own semester — enforced again here, even though RLS already
- * filters, so a forged ID can never bypass).
+ * Safe download file name: the material title plus the stored file's
+ * (allowlisted) extension. Only letters (Arabic included), digits, marks,
+ * spaces and `._()-` survive — no path separators, quotes, control or
+ * bidi-override characters can reach the Content-Disposition header.
  */
-export async function getMaterialForStudent(
+export function buildDownloadFilename(title: string, storagePath: string): string {
+  const rawExt = storagePath.split(".").pop()?.toLowerCase() ?? "";
+  const ext = DOWNLOAD_EXTENSIONS.has(rawExt) ? rawExt : "pdf";
+  const base = title
+    .normalize("NFC")
+    .replace(/[^\p{L}\p{N}\p{M} ._()-]/gu, "")
+    .replace(/\s+/g, " ")
+    .replace(/^[ .]+|[ .]+$/g, "")
+    .slice(0, 80)
+    .trim();
+  return `${base || "material"}.${ext}`;
+}
+
+/**
+ * Authorize a STUDENT download and mint a short-lived signed URL.
+ *
+ * Full chain authorization (published course + item + material, and the
+ * course must belong to the student's own semester) is enforced here even
+ * though RLS already filters, so a forged ID can never bypass it. Only
+ * materials with a finished file upload are downloadable. The URL is built
+ * with a `download` file name so Storage answers with
+ * Content-Disposition: attachment (never inline), expires after
+ * SIGNED_URL_TTL_SECONDS, and is never persisted or shown in the UI.
+ * The internal storage path never leaves this function.
+ */
+export async function getMaterialDownloadForStudent(
   client: SupabaseClient,
   materialId: string,
   studentSemesterId: string
-): Promise<ReadMaterialResult> {
+): Promise<DownloadResult> {
   const { data: material, error } = await client
     .from("content_materials")
-    .select("*, material_kinds(code), content_items!inner(status, course_id, courses!inner(status, semester_id))")
+    .select("*, content_items!inner(status, course_id, courses!inner(status, semester_id))")
     .eq("id", materialId)
     .maybeSingle();
 
   if (error) {
-    logError("material_read_failed", { message: error.message });
+    logError("material_download_lookup_failed", { code: error.code, message: error.message });
     return { ok: false, status: "not_found" };
   }
   if (!material) return { ok: false, status: "not_found" };
 
   const row = material as Record<string, unknown>;
-  const kind = row.material_kinds as { code: string };
   const item = row.content_items as unknown as { status: string; courses: { status: string; semester_id: string } };
   const course = item.courses;
+  const m = row as unknown as ContentMaterial;
 
   if (
-    !chainAllowsStudent(
-      course.status as Status,
-      item.status as Status,
-      row.status as Status
-    ) ||
+    !chainAllowsStudent(course.status as Status, item.status as Status, m.status) ||
     course.semester_id !== studentSemesterId
   ) {
     return { ok: false, status: "unauthorized" };
   }
 
-  const { content_items: _ci, material_kinds: _mk, ...rest } = row;
-  const clean = rest as unknown as ContentMaterial;
-
-  // Upload-state invariants (defense in depth on top of the DB CHECK):
-  // reject impossible combinations like ready with a NULL storage_path.
+  // Only a finished file upload with a real path is downloadable
+  // (article-only / pending / inconsistent rows are not).
   if (
-    !isConsistentUploadState(
-      clean.upload_status,
-      clean.storage_path,
-      clean.article != null,
-      clean.status
-    )
+    m.upload_status !== "ready" ||
+    !m.storage_path ||
+    !isConsistentUploadState(m.upload_status, m.storage_path, m.article != null, m.status)
   ) {
-    logError("material_inconsistent_upload_state", { id: clean.id });
     return { ok: false, status: "not_found" };
   }
 
-  // A material whose file upload never finished (no article either) is not
-  // viewable, even if it were somehow published.
-  if (!isStudentVisibleState(clean.upload_status, clean.article != null)) {
+  const filename = buildDownloadFilename(m.title, m.storage_path);
+  // NOTE: the `download` option of createSignedUrl() is NOT used: storage-js
+  // runs encodeURI() over an already-encoded query string, so any non-ASCII
+  // (Arabic) file name arrives double-encoded and the browser would save the
+  // file as "%D9%85%D8%AD...". The name is appended here with a single,
+  // correct encoding instead; the signed token does not cover the query.
+  const { data: signed, error: signError } = await client.storage
+    .from("content-files")
+    .createSignedUrl(m.storage_path, SIGNED_URL_TTL_SECONDS);
+  if (signError || !signed?.signedUrl) {
+    logError("signed_url_failed", { materialId, message: signError?.message });
     return { ok: false, status: "not_found" };
   }
-
-  let article: Article | null = null;
-  if (clean.article) {
-    // Article JSON was validated on upload; re-validate defensively at read time.
-    const parsed = parseArticle(JSON.stringify(clean.article));
-    article = parsed.ok ? parsed.article : null;
-  }
-
-  let fileUrl: string | null = null;
-  if (clean.storage_path) {
-    const { data: signed, error } = await client.storage
-      .from("content-files")
-      .createSignedUrl(clean.storage_path, SIGNED_URL_TTL_SECONDS);
-    if (error || !signed?.signedUrl) {
-      logError("signed_url_failed", { message: error?.message });
-      return { ok: false, status: "not_found" };
-    }
-    fileUrl = signed.signedUrl;
-  }
-
-  return { ok: true, material: clean, kindCode: kind.code, article, fileUrl };
+  const url = new URL(signed.signedUrl);
+  url.searchParams.set("download", filename);
+  return { ok: true, url: url.toString(), filename };
 }
 
 export type UploadResult = { ok: true; materialId: string } | { ok: false; error: string };
