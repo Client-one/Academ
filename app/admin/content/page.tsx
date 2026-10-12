@@ -63,7 +63,7 @@ export default async function AdminContentPage({
           ) : (
             <ul className="space-y-2">
               {h.items.map((i) => (
-                <li key={i.id} className="rounded-xl border border-ink-100 bg-white p-3 shadow-card">
+                <li key={i.id} className="rounded-2xl border border-ink-200/70 bg-white p-3 shadow-card">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="font-bold text-ink-900">
                       {i.title} <Badge tone={statusTone(i.status)}>{statusLabel(i.status)}</Badge>

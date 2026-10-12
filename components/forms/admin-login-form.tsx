@@ -20,7 +20,7 @@ export function AdminLoginForm() {
       <Field label="كلمة المرور" htmlFor="password">
         <PasswordInput id="password" name="password" />
       </Field>
-      <Button type="submit" size="lg" className="w-full" disabled={pending}>
+      <Button type="submit" size="lg" className="w-full shadow-lg shadow-brand-900/20" disabled={pending}>
         {pending ? "جارٍ الدخول…" : "دخول لوحة الإدارة"}
       </Button>
     </form>

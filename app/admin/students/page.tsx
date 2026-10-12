@@ -75,7 +75,7 @@ export default async function AdminStudentsPage({
       ) : students.length === 0 ? (
         <EmptyState title="لا يوجد طلاب" />
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-ink-100 bg-white shadow-card">
+        <div className="overflow-x-auto rounded-2xl border border-ink-200/70 bg-white shadow-card">
           <table className="w-full min-w-[760px] text-sm">
             <thead>
               <tr className="border-b border-ink-100 text-right text-ink-500">

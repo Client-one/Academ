@@ -67,7 +67,7 @@ export default async function AdminCoursesPage({
       ) : (
         <ul className="space-y-2">
           {courses.map((c) => (
-            <li key={c.id} className="rounded-xl border border-ink-100 bg-white p-3 shadow-card">
+            <li key={c.id} className="rounded-2xl border border-ink-200/70 bg-white p-3 shadow-card">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="font-bold text-ink-900">
                   {c.name}{" "}

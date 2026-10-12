@@ -1,4 +1,5 @@
-import { PendingLink } from "./pending-link";
+import { Brand } from "@/components/public/brand";
+import { NavLinks } from "./nav-links";
 import { LogoutButton } from "./logout-button";
 
 const links = [
@@ -13,27 +14,25 @@ const links = [
 
 export function AdminNav({ adminName }: { adminName: string }) {
   return (
-    <header className="sticky top-0 z-10 border-b border-ink-100 bg-white/90 backdrop-blur">
+    <header className="sticky top-0 z-20 border-b border-white/10 bg-gradient-to-l from-slate-950 via-brand-950 to-slate-900 text-white">
       <div className="mx-auto max-w-6xl px-4 py-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-3">
-            <span className="text-lg font-extrabold text-brand-800">لوحة الإدارة</span>
-            <span className="rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-bold text-brand-800">
-              {adminName}
+            <Brand tone="light" />
+            <span className="hidden rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-brand-100 sm:inline">
+              لوحة الإدارة
             </span>
           </div>
-          <LogoutButton />
+          <div className="flex items-center gap-3">
+            <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">{adminName}</span>
+            <LogoutButton onDark />
+          </div>
         </div>
-        <nav className="mt-2 flex gap-1 overflow-x-auto text-sm font-semibold text-ink-600">
-          {links.map((l) => (
-            <PendingLink
-              key={l.href}
-              href={l.href}
-              className="whitespace-nowrap rounded-lg px-3 py-1.5 hover:bg-ink-100"
-            >
-              {l.label}
-            </PendingLink>
-          ))}
+        <nav
+          aria-label="أقسام الإدارة"
+          className="-mx-1 mt-3 flex gap-1 overflow-x-auto rounded-2xl bg-white p-1.5 text-sm font-semibold shadow-lift"
+        >
+          <NavLinks items={links} exact={["/admin"]} />
         </nav>
       </div>
     </header>

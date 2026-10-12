@@ -41,9 +41,9 @@ export default async function CoursePage({
               <PendingLink
                 href={`/courses/${courseId}/${item.id}`}
                 indicator="corner"
-                className="flex items-center gap-3 rounded-xl border border-ink-100 bg-white p-4 shadow-card transition-colors hover:border-brand-300"
+                className="flex items-center gap-3 rounded-2xl border border-ink-200/70 bg-white p-4 shadow-card transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-lift motion-reduce:transition-none motion-reduce:hover:translate-y-0"
               >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-50 text-sm font-extrabold text-brand-800">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-violet-600 text-sm font-extrabold text-white">
                   {idx + 1}
                 </span>
                 <span className="min-w-0">

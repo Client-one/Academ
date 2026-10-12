@@ -47,7 +47,7 @@ export default async function ContentItemPage({
           {materials.map((m) => {
             const meta = MATERIAL_KIND_META[m.kind_code ?? ""];
             return (
-              <div key={m.id} className="flex h-full flex-col rounded-2xl border border-ink-100 bg-white p-4 shadow-card">
+              <div key={m.id} className="flex h-full flex-col rounded-2xl border border-ink-200/70 bg-white p-4 shadow-card">
                 <div className="mb-2">
                   <Badge tone={meta?.badge === "official" ? "official" : "student"}>
                     {meta?.label ?? "مادة"}

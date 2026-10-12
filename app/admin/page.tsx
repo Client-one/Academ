@@ -24,8 +24,8 @@ export default async function AdminOverviewPage() {
       <PageHeader title="نظرة عامة" subtitle="حالة المنصة الحالية." />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {cards.map((c) => (
-          <Card key={c.label} className="text-center">
-            <p className="text-2xl font-extrabold text-brand-800">{c.value}</p>
+          <Card key={c.label} className="border-t-4 border-t-brand-500 text-center">
+            <p className="bg-gradient-to-br from-brand-600 to-violet-600 bg-clip-text text-3xl font-extrabold text-transparent">{c.value}</p>
             <CardTitle className="mt-1 text-sm">{c.label}</CardTitle>
           </Card>
         ))}

@@ -92,7 +92,7 @@ export default async function AdminMaterialsPage({
           ) : (
             <ul className="space-y-3">
               {materials.map((m) => (
-                <li key={m.id} className="rounded-xl border border-ink-100 bg-white p-4 shadow-card">
+                <li key={m.id} className="rounded-2xl border border-ink-200/70 bg-white p-4 shadow-card">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="font-bold text-ink-900">
                       {m.title}{" "}

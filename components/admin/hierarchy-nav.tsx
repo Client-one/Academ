@@ -52,7 +52,7 @@ export function HierarchyNav({
   return (
     <nav
       aria-label="التنقل في الهيكل الأكاديمي"
-      className="mb-6 grid gap-3 rounded-2xl border border-ink-100 bg-white p-4 shadow-card sm:grid-cols-2 lg:grid-cols-4"
+      className="mb-6 grid gap-3 rounded-2xl border border-ink-200/70 bg-white p-4 shadow-card sm:grid-cols-2 lg:grid-cols-4"
     >
       <label className="block text-sm font-semibold text-ink-700">
         المستوى

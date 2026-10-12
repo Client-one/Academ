@@ -1,8 +1,13 @@
-import Link from "next/link";
-import { PendingLink } from "./pending-link";
 import { requireStudent } from "@/lib/security/guards";
 import { createClient } from "@/lib/supabase/server";
+import { Brand } from "@/components/public/brand";
+import { NavLinks } from "./nav-links";
 import { LogoutButton } from "./logout-button";
+
+const items = [
+  { href: "/dashboard", label: "الرئيسية" },
+  { href: "/courses", label: "المقررات" },
+];
 
 export async function StudentNav() {
   const { profile } = await requireStudent();
@@ -17,19 +22,12 @@ export async function StudentNav() {
   ]);
 
   return (
-    <header className="sticky top-0 z-10 border-b border-ink-100 bg-white/90 backdrop-blur">
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-2 px-4 py-3">
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard" className="text-lg font-extrabold text-brand-800">
-            المنصة الأكاديمية
-          </Link>
-          <nav className="flex items-center gap-1 text-sm font-semibold text-ink-600">
-            <PendingLink href="/dashboard" className="rounded-lg px-3 py-1.5 hover:bg-ink-100">
-              الرئيسية
-            </PendingLink>
-            <PendingLink href="/courses" className="rounded-lg px-3 py-1.5 hover:bg-ink-100">
-              المقررات
-            </PendingLink>
+    <header className="sticky top-0 z-20 border-b border-ink-200/70 bg-white/90 backdrop-blur">
+      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-2.5">
+        <div className="flex items-center gap-5">
+          <Brand />
+          <nav aria-label="التنقل" className="flex items-center gap-1 text-sm font-semibold">
+            <NavLinks items={items} />
           </nav>
         </div>
         <div className="flex items-center gap-3">
