@@ -1,39 +1,58 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { LoginForm } from "@/components/forms/login-form";
-import { Card, CardTitle } from "@/components/ui/card";
-import { createClient } from "@/lib/supabase/server";
+import { ArrowIcon, SettingsIcon, UserIcon } from "@/components/public/icons";
+import { AuthShell } from "@/components/public/auth-shell";
 
-export default async function LoginPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (user) redirect("/dashboard");
+export const metadata: Metadata = {
+  title: "تسجيل الدخول | Academ",
+  description: "اختر نوع حسابك للمتابعة إلى منصة Academ.",
+};
 
+const roles = [
+  {
+    href: "/login/student",
+    title: "تسجيل دخول الطالب",
+    desc: "ادخل إلى حسابك للوصول إلى مقرراتك وموادك الدراسية.",
+    cta: "المتابعة كطالب",
+    Icon: UserIcon,
+    accent: "from-indigo-500 to-blue-600",
+  },
+  {
+    href: "/login/admin",
+    title: "تسجيل دخول المدير",
+    desc: "الدخول إلى لوحة الإدارة لإدارة المحتوى والطلاب والصلاحيات.",
+    cta: "المتابعة كمدير",
+    Icon: SettingsIcon,
+    accent: "from-violet-500 to-purple-700",
+  },
+];
+
+export default function LoginChoicePage() {
   return (
-    <main className="flex min-h-screen items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-700 text-2xl text-white shadow-card" aria-hidden>
-            🎓
-          </div>
-          <h1 className="text-2xl font-extrabold text-ink-950">المنصة الأكاديمية</h1>
-          <p className="mt-1 text-sm text-ink-500">موادك الدراسية، منظمة وآمنة، في مكان واحد.</p>
-        </div>
-        <Card>
-          <CardTitle className="mb-4">تسجيل دخول الطالب</CardTitle>
-          <LoginForm />
-        </Card>
-        <p className="mt-4 text-center text-xs text-ink-400">
-          حسابك يُنشأ من إدارة الكلية — لا يوجد تسجيل ذاتي.
-        </p>
-        <p className="mt-2 text-center text-sm">
-          <Link href="/admin-login" className="font-semibold text-brand-700 hover:underline">
-            دخول الإدارة
-          </Link>
-        </p>
+    <AuthShell wide>
+      <div className="mb-8 text-center">
+        <h1 className="text-3xl font-extrabold text-white sm:text-4xl">مرحبًا بك في Academ</h1>
+        <p className="mt-3 text-base text-indigo-100">اختر نوع حسابك للمتابعة إلى المنصة.</p>
       </div>
-    </main>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {roles.map(({ href, title, desc, cta, Icon, accent }) => (
+          <Link
+            key={href}
+            href={href}
+            className="group flex flex-col rounded-3xl border border-white/10 bg-white p-6 shadow-xl transition hover:-translate-y-1 hover:shadow-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300 active:translate-y-0 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+          >
+            <span className={`mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${accent} text-white shadow-lg`}>
+              <Icon className="h-7 w-7" />
+            </span>
+            <h2 className="text-xl font-extrabold text-slate-950">{title}</h2>
+            <p className="mt-2 flex-1 text-sm leading-7 text-slate-600">{desc}</p>
+            <span className="mt-6 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 text-sm font-bold text-white transition-colors group-hover:bg-indigo-700">
+              {cta}
+              <ArrowIcon className="h-4 w-4" />
+            </span>
+          </Link>
+        ))}
+      </div>
+    </AuthShell>
   );
 }

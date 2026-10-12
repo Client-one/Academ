@@ -6,6 +6,7 @@ import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/forms/password-input";
 
 export function LoginForm() {
   const [state, formAction, pending] = useActionState<AuthFormState, FormData>(studentLogin, {});
@@ -26,7 +27,7 @@ export function LoginForm() {
         />
       </Field>
       <Field label="كلمة المرور" htmlFor="password">
-        <Input id="password" name="password" type="password" required autoComplete="current-password" />
+        <PasswordInput id="password" name="password" />
       </Field>
       <Button type="submit" size="lg" className="w-full" disabled={pending}>
         {pending ? "جارٍ الدخول…" : "تسجيل الدخول"}

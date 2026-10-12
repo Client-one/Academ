@@ -69,7 +69,7 @@ values (`.gitignore` already excludes `.env*`), never log them.
 ## 5) Initial admin creation (manual, one time)
 
 1. Supabase → Authentication → Users → **Add user** → create with a strong
-   password (this is the real admin email used at `/admin-login`).
+   password (this is the real admin email used at `/login/admin`).
 2. Copy the user's UUID, then in SQL Editor:
 
 ```sql
@@ -77,7 +77,7 @@ insert into public.profiles (id, full_name, role)
 values ('<PASTE_UUID_HERE>', 'المدير العام', 'admin');
 ```
 
-3. Log in at `https://your-app.vercel.app/admin-login`.
+3. Log in at `https://your-app.vercel.app/login/admin`.
 
 ## 6) GitHub + Vercel deploy
 

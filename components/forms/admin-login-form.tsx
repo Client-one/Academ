@@ -6,6 +6,7 @@ import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/forms/password-input";
 
 export function AdminLoginForm() {
   const [state, formAction, pending] = useActionState<AuthFormState, FormData>(adminLogin, {});
@@ -17,10 +18,10 @@ export function AdminLoginForm() {
         <Input id="email" name="email" type="email" required autoComplete="username" dir="ltr" className="text-right" />
       </Field>
       <Field label="كلمة المرور" htmlFor="password">
-        <Input id="password" name="password" type="password" required autoComplete="current-password" />
+        <PasswordInput id="password" name="password" />
       </Field>
       <Button type="submit" size="lg" className="w-full" disabled={pending}>
-        {pending ? "جارٍ الدخول…" : "دخول المدير"}
+        {pending ? "جارٍ الدخول…" : "دخول لوحة الإدارة"}
       </Button>
     </form>
   );

@@ -35,7 +35,7 @@ async function loadContext(): Promise<SessionContext | null> {
 
 export async function requireUser(): Promise<SessionContext> {
   const ctx = await loadContext();
-  if (!ctx) redirect("/login");
+  if (!ctx) redirect("/login/student");
   return ctx;
 }
 
@@ -49,6 +49,6 @@ export async function requireStudent(): Promise<SessionContext> {
 
 export async function requireAdmin(): Promise<SessionContext> {
   const ctx = await requireUser();
-  if (ctx.profile.role !== "admin") redirect("/admin-login");
+  if (ctx.profile.role !== "admin") redirect("/login/admin");
   return ctx;
 }

@@ -37,7 +37,7 @@ export async function updateSession(request: NextRequest) {
 
   if (!user && (isStudentPath || isAdminPath)) {
     const url = request.nextUrl.clone();
-    url.pathname = isAdminPath ? "/admin-login" : "/login";
+    url.pathname = isAdminPath ? "/login/admin" : "/login/student";
     url.search = "";
     return NextResponse.redirect(url);
   }
