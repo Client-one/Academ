@@ -1,5 +1,5 @@
 import { setStatusAction, moveAction } from "@/app/admin/actions/academics";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/submit-button";
 import type { Status } from "@/lib/types";
 
 type NativeFormAction = (formData: FormData) => Promise<void>;
@@ -16,7 +16,7 @@ export function StatusButtons({ kind, id, status }: { kind: string; id: string; 
           <input type="hidden" name="kind" value={kind} />
           <input type="hidden" name="id" value={id} />
           <input type="hidden" name="status" value="published" />
-          <Button type="submit" size="sm" variant="secondary">نشر</Button>
+          <SubmitButton size="sm" variant="secondary">نشر</SubmitButton>
         </form>
       )}
       {status !== "draft" && (
@@ -24,7 +24,7 @@ export function StatusButtons({ kind, id, status }: { kind: string; id: string; 
           <input type="hidden" name="kind" value={kind} />
           <input type="hidden" name="id" value={id} />
           <input type="hidden" name="status" value="draft" />
-          <Button type="submit" size="sm" variant="ghost">مسودة</Button>
+          <SubmitButton size="sm" variant="ghost">مسودة</SubmitButton>
         </form>
       )}
       {status !== "archived" && (
@@ -32,7 +32,7 @@ export function StatusButtons({ kind, id, status }: { kind: string; id: string; 
           <input type="hidden" name="kind" value={kind} />
           <input type="hidden" name="id" value={id} />
           <input type="hidden" name="status" value="archived" />
-          <Button type="submit" size="sm" variant="ghost">أرشفة</Button>
+          <SubmitButton size="sm" variant="ghost">أرشفة</SubmitButton>
         </form>
       )}
     </div>
@@ -47,7 +47,7 @@ export function MoveButtons({ kind, id }: { kind: string; id: string }) {
           <input type="hidden" name="kind" value={kind} />
           <input type="hidden" name="id" value={id} />
           <input type="hidden" name="delta" value={d} />
-          <Button type="submit" size="sm" variant="ghost">{d === 1 ? "↓" : "↑"}</Button>
+          <SubmitButton size="sm" variant="ghost">{d === 1 ? "↓" : "↑"}</SubmitButton>
         </form>
       ))}
     </div>

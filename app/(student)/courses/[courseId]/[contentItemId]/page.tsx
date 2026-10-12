@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PendingLink } from "@/components/pending-link";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { DownloadLink, hasDownloadableFile } from "@/components/download-link";
@@ -68,9 +68,9 @@ export default async function ContentItemPage({
         </div>
       )}
       <p className="mt-6 text-sm">
-        <Link href={`/courses/${courseId}`} className="font-semibold text-ink-600 hover:underline">
+        <PendingLink href={`/courses/${courseId}`} className="font-semibold text-ink-600 hover:underline">
           → العودة إلى المقرر
-        </Link>
+        </PendingLink>
       </p>
     </>
   );

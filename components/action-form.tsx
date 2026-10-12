@@ -14,12 +14,15 @@ export function ActionForm({
   action,
   children,
   submitLabel = "حفظ",
+  pendingLabel = "جارٍ الحفظ…",
   className = "",
   maxFileBytes,
 }: {
   action: FormAction;
   children: ReactNode;
   submitLabel?: string;
+  /** Text shown on the button while the action runs (per operation). */
+  pendingLabel?: string;
   className?: string;
   /** Optional client-side guard so an oversize file is rejected before upload. */
   maxFileBytes?: number;
@@ -52,7 +55,7 @@ export function ActionForm({
       {state.success && <Alert kind="success">{state.success}</Alert>}
       {children}
       <Button type="submit" disabled={pending}>
-        {pending ? "جارٍ الحفظ…" : submitLabel}
+        {pending ? pendingLabel : submitLabel}
       </Button>
     </form>
   );

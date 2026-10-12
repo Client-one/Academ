@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PendingLink } from "@/components/pending-link";
 import { Card, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -17,12 +17,12 @@ export default async function CoursesPage() {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {courses.map((course) => (
-            <Link key={course.id} href={`/courses/${course.id}`}>
+            <PendingLink key={course.id} href={`/courses/${course.id}`} indicator="corner">
               <Card className="h-full transition-colors hover:border-brand-300">
                 <CardTitle>{course.name}</CardTitle>
                 <p className="mt-1 text-sm text-ink-500" dir="ltr">{course.code}</p>
               </Card>
-            </Link>
+            </PendingLink>
           ))}
         </div>
       )}

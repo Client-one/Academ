@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PendingLink } from "@/components/pending-link";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -38,8 +38,9 @@ export default async function CoursePage({
         <ol className="space-y-2">
           {published.map((item, idx) => (
             <li key={item.id}>
-              <Link
+              <PendingLink
                 href={`/courses/${courseId}/${item.id}`}
+                indicator="corner"
                 className="flex items-center gap-3 rounded-xl border border-ink-100 bg-white p-4 shadow-card transition-colors hover:border-brand-300"
               >
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-50 text-sm font-extrabold text-brand-800">
@@ -52,7 +53,7 @@ export default async function CoursePage({
                   )}
                 </span>
                 <Badge tone="neutral">مُنشَر</Badge>
-              </Link>
+              </PendingLink>
             </li>
           ))}
         </ol>

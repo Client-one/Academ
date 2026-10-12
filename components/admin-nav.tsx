@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PendingLink } from "./pending-link";
 import { LogoutButton } from "./logout-button";
 
 const links = [
@@ -26,13 +26,13 @@ export function AdminNav({ adminName }: { adminName: string }) {
         </div>
         <nav className="mt-2 flex gap-1 overflow-x-auto text-sm font-semibold text-ink-600">
           {links.map((l) => (
-            <Link
+            <PendingLink
               key={l.href}
               href={l.href}
               className="whitespace-nowrap rounded-lg px-3 py-1.5 hover:bg-ink-100"
             >
               {l.label}
-            </Link>
+            </PendingLink>
           ))}
         </nav>
       </div>

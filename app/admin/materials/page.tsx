@@ -64,7 +64,7 @@ export default async function AdminMaterialsPage({
         <>
           <Card className="mb-6">
             <CardTitle className="mb-4">رفع مادة جديدة</CardTitle>
-            <ActionForm action={uploadMaterialAction} submitLabel="رفع الملف" maxFileBytes={MAX_SERVER_UPLOAD_BYTES}>
+            <ActionForm action={uploadMaterialAction} submitLabel="رفع الملف" pendingLabel="جارٍ الرفع…" maxFileBytes={MAX_SERVER_UPLOAD_BYTES}>
               <input type="hidden" name="content_item_id" value={itemId} />
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="نوع المادة">

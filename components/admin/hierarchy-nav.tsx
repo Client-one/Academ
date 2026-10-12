@@ -134,11 +134,22 @@ export function HierarchyNav({
         </label>
       )}
 
-      {pending && (
-        <span className="flex items-center gap-2 text-sm text-ink-500" role="status" aria-live="polite">
-          جارٍ التحميل…
-        </span>
-      )}
+      {/* Reserved row: always occupies its height so showing it never shifts the page. */}
+      <p
+        className={`col-span-full flex h-5 items-center gap-2 text-sm text-ink-500 ${pending ? "" : "invisible"}`}
+        role="status"
+        aria-live="polite"
+      >
+        {pending && (
+          <>
+            <span
+              aria-hidden
+              className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-brand-200 border-t-brand-700 motion-reduce:animate-none"
+            />
+            جارٍ التحميل…
+          </>
+        )}
+      </p>
     </nav>
   );
 }

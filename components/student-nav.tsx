@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PendingLink } from "./pending-link";
 import { requireStudent } from "@/lib/security/guards";
 import { createClient } from "@/lib/supabase/server";
 import { LogoutButton } from "./logout-button";
@@ -23,12 +24,12 @@ export async function StudentNav() {
             المنصة الأكاديمية
           </Link>
           <nav className="flex items-center gap-1 text-sm font-semibold text-ink-600">
-            <Link href="/dashboard" className="rounded-lg px-3 py-1.5 hover:bg-ink-100">
+            <PendingLink href="/dashboard" className="rounded-lg px-3 py-1.5 hover:bg-ink-100">
               الرئيسية
-            </Link>
-            <Link href="/courses" className="rounded-lg px-3 py-1.5 hover:bg-ink-100">
+            </PendingLink>
+            <PendingLink href="/courses" className="rounded-lg px-3 py-1.5 hover:bg-ink-100">
               المقررات
-            </Link>
+            </PendingLink>
           </nav>
         </div>
         <div className="flex items-center gap-3">

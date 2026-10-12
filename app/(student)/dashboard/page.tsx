@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PendingLink } from "@/components/pending-link";
 import { redirect } from "next/navigation";
 import { Card, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -60,18 +60,18 @@ export default async function DashboardPage({
           {results && totalResults > 0 && (
             <div className="space-y-2">
               {results.courses.map((c) => (
-                <Link key={c.id} href={`/courses/${c.id}`}
+                <PendingLink indicator="corner" key={c.id} href={`/courses/${c.id}`}
                   className="block rounded-xl border border-ink-100 bg-white p-3 shadow-card hover:border-brand-300">
                   <span className="font-bold text-ink-900">{c.name}</span>
                   <span className="mr-2 text-xs text-ink-500" dir="ltr">{c.code}</span>
-                </Link>
+                </PendingLink>
               ))}
               {results.contentItems.map((i) => (
-                <Link key={i.id} href={`/courses/${i.course_id}/${i.id}`}
+                <PendingLink indicator="corner" key={i.id} href={`/courses/${i.course_id}/${i.id}`}
                   className="block rounded-xl border border-ink-100 bg-white p-3 shadow-card hover:border-brand-300">
                   <span className="font-bold text-ink-900">{i.title}</span>
                   <span className="mr-2 text-xs text-ink-500">عنوان محتوى</span>
-                </Link>
+                </PendingLink>
               ))}
               {results.materials.map((m) => (
                 <div key={m.id}
@@ -101,7 +101,7 @@ export default async function DashboardPage({
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
             {courses.map((course) => (
-              <Link key={course.id} href={`/courses/${course.id}`}>
+              <PendingLink indicator="corner" key={course.id} href={`/courses/${course.id}`}>
                 <Card className="h-full transition-colors hover:border-brand-300">
                   <CardTitle>{course.name}</CardTitle>
                   <p className="mt-1 text-sm text-ink-500" dir="ltr">{course.code}</p>
@@ -109,7 +109,7 @@ export default async function DashboardPage({
                     <p className="mt-2 line-clamp-2 text-sm text-ink-600">{course.description}</p>
                   )}
                 </Card>
-              </Link>
+              </PendingLink>
             ))}
           </div>
         )}
