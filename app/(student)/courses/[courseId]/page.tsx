@@ -28,13 +28,12 @@ export default async function CoursePage({
 
   return (
     <>
-      <section className={`relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-br ${courseAccent(courseId)} p-6 text-white shadow-lift sm:p-8`}>
-        <div aria-hidden className="pointer-events-none absolute -bottom-16 end-4 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
-        <p className="relative text-sm font-semibold text-white/95" dir="ltr">
+      <section className={`mb-8 rounded-3xl p-6 sm:p-8 ${courseAccent(courseId)}`}>
+        <p className="text-sm font-semibold opacity-80" dir="ltr">
           {(course as { code: string }).code}
         </p>
-        <h1 className="relative mt-1 text-2xl font-extrabold sm:text-3xl">{(course as { name: string }).name}</h1>
-        <p className="relative mt-2 text-sm text-white/95">{published.length} محور منشور</p>
+        <h1 className="mt-1 text-2xl font-extrabold sm:text-3xl">{(course as { name: string }).name}</h1>
+        <p className="mt-2 text-sm opacity-80">{published.length} محور منشور</p>
       </section>
       {published.length === 0 ? (
         <EmptyState title="لم تُنشر محاور بعد" hint="ستُضاف محاور المقرر هنا فور اعتمادها." />
@@ -45,9 +44,9 @@ export default async function CoursePage({
               <PendingLink
                 href={`/courses/${courseId}/${item.id}`}
                 indicator="corner"
-                className="flex items-center gap-3 rounded-2xl border border-ink-200/70 bg-white p-4 shadow-card transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-lift motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+                className="flex items-center gap-3 rounded-2xl border border-ink-200/70 bg-white p-4 shadow-card transition hover:border-brand-400 hover:shadow-lift motion-reduce:transition-none"
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-violet-600 text-sm font-extrabold text-white">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-sm font-extrabold text-brand-800 dark:text-brand-300">
                   {idx + 1}
                 </span>
                 <span className="min-w-0">

@@ -24,10 +24,10 @@ export function LandingHeader() {
   }, [open]);
 
   const linkCls =
-    "rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition-colors hover:bg-indigo-50 hover:text-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500";
+    "rounded-lg px-3 py-2 text-sm font-semibold text-ink-600 transition-colors hover:bg-brand-50 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:hover:text-brand-300";
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-ink-200 bg-white/90 backdrop-blur">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-3 px-4">
         <Brand />
 
@@ -43,13 +43,13 @@ export function LandingHeader() {
           <ThemeToggle />
           <Link
             href="/login"
-            className="inline-flex min-h-[44px] items-center rounded-xl bg-indigo-700 px-5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-indigo-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+            className="inline-flex min-h-[44px] items-center rounded-xl bg-brand-700 px-5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
           >
             تسجيل الدخول
           </Link>
           <button
             type="button"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 md:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-ink-200 text-ink-700 hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 md:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? "إغلاق القائمة" : "فتح القائمة"}
@@ -61,7 +61,7 @@ export function LandingHeader() {
       </div>
 
       {open && (
-        <nav id="mobile-nav" aria-label="القائمة" className="border-t border-slate-200 bg-white md:hidden">
+        <nav id="mobile-nav" aria-label="القائمة" className="border-t border-ink-200 bg-white md:hidden">
           <ul className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-3">
             {links.map((l) => (
               <li key={l.href}>

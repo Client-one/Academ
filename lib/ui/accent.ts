@@ -1,15 +1,15 @@
 /**
  * Stable per-course accent (same course => same colors everywhere).
- * Every stop is Tailwind 600+ so white text keeps >= 4.5:1 contrast
- * (checked: lightest start color, sky-700, is 5.9:1).
+ * Soft tinted tiles with a darker glyph/text color: calm on the eyes and
+ * every pair keeps >= 4.5:1 contrast (text-*-800 on bg-*-100).
  */
 const ACCENTS = [
-  "from-indigo-600 to-violet-700",
-  "from-blue-600 to-indigo-700",
-  "from-violet-600 to-purple-800",
-  "from-sky-700 to-blue-800",
-  "from-fuchsia-600 to-violet-800",
-  "from-cyan-700 to-indigo-700",
+  "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200",
+  "bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-200",
+  "bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200",
+  "bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-200",
+  "bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-200",
+  "bg-stone-200 text-stone-800 dark:bg-stone-700/60 dark:text-stone-100",
 ] as const;
 
 export function courseAccent(id: string): string {

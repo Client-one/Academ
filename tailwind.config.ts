@@ -41,8 +41,8 @@ const config: Config = {
         sans: ["var(--font-sans)", '"Segoe UI"', "Tahoma", "Arial", "sans-serif"],
       },
       boxShadow: {
-        card: "0 1px 2px 0 rgb(15 23 42 / 0.04), 0 4px 16px -4px rgb(49 46 129 / 0.10)",
-        lift: "0 12px 32px -8px rgb(49 46 129 / 0.25)",
+        card: "0 1px 2px 0 rgb(39 36 31 / 0.04), 0 2px 8px -2px rgb(39 36 31 / 0.06)",
+        lift: "0 8px 24px -8px rgb(39 36 31 / 0.14)",
       },
     },
   },

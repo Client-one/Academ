@@ -46,9 +46,9 @@ export function ContinueCard() {
   return (
     <Link
       href={visit.href}
-      className="group mb-8 flex items-center gap-4 rounded-2xl border border-brand-200 bg-white p-4 shadow-card transition hover:-translate-y-0.5 hover:shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+      className="group mb-8 flex items-center gap-4 rounded-2xl border border-brand-200 bg-white p-4 shadow-card transition hover:border-brand-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 motion-reduce:transition-none"
     >
-      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-violet-600 text-white">
+      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-800 dark:text-brand-300">
         <BookIcon className="h-6 w-6" />
       </span>
       <span className="min-w-0 flex-1">

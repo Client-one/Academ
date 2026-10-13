@@ -1,6 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { findStudentAuthEmail } from "@/lib/data/students";
+import { logError } from "@/lib/security/logger";
 
 /**
  * Student sign-in core (no redirects, so it is unit-testable).
@@ -15,13 +16,20 @@ export async function signInStudent(
   password: string
 ): Promise<{ ok: boolean }> {
   const internalEmail = await findStudentAuthEmail(universityId);
-  if (!internalEmail) return { ok: false };
+  if (!internalEmail) {
+    // Server log only (never shown to the user): no active student matched.
+    logError("student_login_failed", { stage: "no_active_student_match" });
+    return { ok: false };
+  }
 
   const { data, error } = await supabase.auth.signInWithPassword({
     email: internalEmail,
     password,
   });
-  if (error || !data?.user) return { ok: false };
+  if (error || !data?.user) {
+    logError("student_login_failed", { stage: "auth_rejected", status: error?.status, message: error?.message });
+    return { ok: false };
+  }
 
   // Never trust the session alone: re-verify role + active under RLS.
   const { data: profile } = await supabase
@@ -31,6 +39,7 @@ export async function signInStudent(
     .maybeSingle();
   const p = profile as { role: string; is_active: boolean } | null;
   if (!p || p.role !== "student" || !p.is_active) {
+    logError("student_login_failed", { stage: "profile_check", found: !!p, role: p?.role, active: p?.is_active });
     await supabase.auth.signOut();
     return { ok: false };
   }

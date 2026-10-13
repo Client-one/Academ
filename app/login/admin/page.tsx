@@ -30,11 +30,11 @@ export default async function AdminLoginPage() {
   return (
     <AuthShell>
       <AuthPanel>
-        <h1 className="text-2xl font-extrabold text-slate-950">تسجيل دخول المدير</h1>
-        <p className="mb-6 mt-1 text-sm text-slate-500">دخول خاص بالمسؤولين فقط.</p>
+        <h1 className="text-2xl font-extrabold text-ink-950">تسجيل دخول المدير</h1>
+        <p className="mb-6 mt-1 text-sm text-ink-600">دخول خاص بالمسؤولين فقط.</p>
         <AdminLoginForm />
         <p className="mt-5 text-center text-sm">
-          <Link href="/login" className="font-semibold text-indigo-700 hover:underline">
+          <Link href="/login" className="font-semibold text-brand-700 dark:text-brand-300 hover:underline">
             تغيير نوع الحساب
           </Link>
         </p>

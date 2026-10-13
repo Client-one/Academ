@@ -15,7 +15,7 @@ const roles = [
     desc: "ادخل إلى حسابك للوصول إلى مقرراتك وموادك الدراسية.",
     cta: "المتابعة كطالب",
     Icon: UserIcon,
-    accent: "from-indigo-500 to-blue-600",
+    accent: "bg-brand-100 text-brand-800 dark:text-brand-300",
   },
   {
     href: "/login/admin",
@@ -23,7 +23,7 @@ const roles = [
     desc: "الدخول إلى لوحة الإدارة لإدارة المحتوى والطلاب والصلاحيات.",
     cta: "المتابعة كمدير",
     Icon: SettingsIcon,
-    accent: "from-violet-500 to-purple-700",
+    accent: "bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200",
   },
 ];
 
@@ -31,22 +31,22 @@ export default function LoginChoicePage() {
   return (
     <AuthShell wide>
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-extrabold text-white sm:text-4xl">مرحبًا بك في Academ</h1>
-        <p className="mt-3 text-base text-indigo-100">اختر نوع حسابك للمتابعة إلى المنصة.</p>
+        <h1 className="text-3xl font-extrabold text-ink-950 sm:text-4xl">مرحبًا بك في Academ</h1>
+        <p className="mt-3 text-base text-ink-600">اختر نوع حسابك للمتابعة إلى المنصة.</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         {roles.map(({ href, title, desc, cta, Icon, accent }) => (
           <Link
             key={href}
             href={href}
-            className="group flex flex-col rounded-3xl border border-white/10 bg-white p-6 shadow-xl transition hover:-translate-y-1 hover:shadow-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300 active:translate-y-0 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+            className="group flex flex-col rounded-3xl border border-ink-200 bg-white p-6 shadow-card transition hover:border-brand-400 hover:shadow-lift focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-200 motion-reduce:transition-none"
           >
-            <span className={`mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${accent} text-white shadow-lg`}>
+            <span className={`mb-5 flex h-14 w-14 items-center justify-center rounded-2xl ${accent}`}>
               <Icon className="h-7 w-7" />
             </span>
-            <h2 className="text-xl font-extrabold text-slate-950">{title}</h2>
-            <p className="mt-2 flex-1 text-sm leading-7 text-slate-600">{desc}</p>
-            <span className="mt-6 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 text-sm font-bold text-white transition-colors group-hover:bg-indigo-700">
+            <h2 className="text-xl font-extrabold text-ink-950">{title}</h2>
+            <p className="mt-2 flex-1 text-sm leading-7 text-ink-600">{desc}</p>
+            <span className="mt-6 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-brand-700 px-5 text-sm font-bold text-white transition-colors group-hover:bg-brand-800">
               {cta}
               <ArrowIcon className="h-4 w-4" />
             </span>

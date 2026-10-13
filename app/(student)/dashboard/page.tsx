@@ -36,28 +36,23 @@ export default async function DashboardPage({
 
   return (
     <>
-      <section className="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-brand-950 to-brand-800 p-6 text-white shadow-lift sm:p-8">
-        <div aria-hidden className="pointer-events-none absolute -bottom-24 end-0 h-64 w-64 rounded-full bg-violet-500/25 blur-3xl" />
-        <div className="relative">
-          <p className="text-sm font-semibold text-brand-200">لوحة الطالب</p>
-          <h1 className="mt-1 text-2xl font-extrabold sm:text-3xl">أهلاً، {profile.full_name}</h1>
-          <p className="mt-2 max-w-xl text-sm leading-7 text-brand-100">
-            تصفح مقررات فصلك الدراسي وابحث في المواد المعتمدة.
-          </p>
-          <form action="/dashboard" method="GET" className="mt-6 flex flex-col gap-2 sm:flex-row" role="search">
-            <Input
-              type="search"
-              name="q"
-              defaultValue={q ?? ""}
-              placeholder="ابحث في المقررات والعناوين والمواد…"
-              aria-label="بحث"
-              className="!border-white/20 !py-3 sm:flex-1"
-            />
-            <Button type="submit" size="lg" className="!from-white !to-brand-50 !text-brand-900 hover:!from-brand-50 hover:!to-brand-100">
-              بحث
-            </Button>
-          </form>
-        </div>
+      <section className="mb-8 rounded-3xl border border-brand-200 bg-brand-50 p-6 sm:p-8">
+        <p className="text-sm font-semibold text-brand-700 dark:text-brand-300">لوحة الطالب</p>
+        <h1 className="mt-1 text-2xl font-extrabold text-ink-950 sm:text-3xl">أهلاً، {profile.full_name}</h1>
+        <p className="mt-2 max-w-xl text-sm leading-7 text-ink-600">
+          تصفح مقررات فصلك الدراسي وابحث في المواد المعتمدة.
+        </p>
+        <form action="/dashboard" method="GET" className="mt-5 flex flex-col gap-2 sm:flex-row" role="search">
+          <Input
+            type="search"
+            name="q"
+            defaultValue={q ?? ""}
+            placeholder="ابحث في المقررات والعناوين والمواد…"
+            aria-label="بحث"
+            className="sm:flex-1"
+          />
+          <Button type="submit" size="lg">بحث</Button>
+        </form>
       </section>
 
       {!hasQuery && <ContinueCard />}
@@ -74,7 +69,7 @@ export default async function DashboardPage({
             <div className="space-y-2">
               {results.courses.map((c) => (
                 <PendingLink indicator="corner" key={c.id} href={`/courses/${c.id}`}
-                  className="block rounded-xl border border-ink-100 bg-white p-3 shadow-card hover:border-brand-300 hover:shadow-lift">
+                  className="block rounded-xl border border-ink-100 bg-white p-3 shadow-card hover:border-brand-400 hover:shadow-lift">
                   <span className="font-bold text-ink-900"><Highlight text={c.name} query={q} /></span>
                   <span className="mr-2 text-xs text-ink-500" dir="ltr">{c.code}</span>
                 </PendingLink>
@@ -115,8 +110,8 @@ export default async function DashboardPage({
           <div className="grid gap-3 sm:grid-cols-2">
             {courses.map((course) => (
               <PendingLink indicator="corner" key={course.id} href={`/courses/${course.id}`}>
-                <Card className="group h-full transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-lift motion-reduce:transition-none motion-reduce:hover:translate-y-0">
-                  <span className={`mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${courseAccent(course.id)} text-white`}>
+                <Card className="group h-full transition hover:border-brand-400 hover:shadow-lift motion-reduce:transition-none">
+                  <span className={`mb-3 flex h-11 w-11 items-center justify-center rounded-xl ${courseAccent(course.id)}`}>
                     <BookIcon className="h-5 w-5" />
                   </span>
                   <CardTitle className="text-lg">{course.name}</CardTitle>

@@ -20,8 +20,8 @@ export default async function CoursesPage() {
         <div className="grid gap-3 sm:grid-cols-2">
           {courses.map((course) => (
             <PendingLink key={course.id} href={`/courses/${course.id}`} indicator="corner">
-              <Card className="h-full transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-lift motion-reduce:transition-none motion-reduce:hover:translate-y-0">
-                <span className={`mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${courseAccent(course.id)} text-white`}>
+              <Card className="h-full transition hover:border-brand-400 hover:shadow-lift motion-reduce:transition-none">
+                <span className={`mb-3 flex h-11 w-11 items-center justify-center rounded-xl ${courseAccent(course.id)}`}>
                   <BookIcon className="h-5 w-5" />
                 </span>
                 <CardTitle className="text-lg">{course.name}</CardTitle>

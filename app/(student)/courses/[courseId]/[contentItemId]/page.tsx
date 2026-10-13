@@ -92,7 +92,7 @@ export default async function ContentItemPage({
                   <Badge tone={meta?.badge === "official" ? "official" : "student"}>
                     {meta?.label ?? "مادة"}
                   </Badge>
-                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-700 dark:text-brand-300">
                     <Icon className="h-5 w-5" />
                   </span>
                 </div>

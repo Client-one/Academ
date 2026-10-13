@@ -22,14 +22,14 @@ export default async function StudentLoginPage() {
   return (
     <AuthShell>
       <AuthPanel>
-        <h1 className="text-2xl font-extrabold text-slate-950">تسجيل دخول الطالب</h1>
-        <p className="mb-6 mt-1 text-sm text-slate-500">ادخل برقم الجامعة وكلمة المرور.</p>
+        <h1 className="text-2xl font-extrabold text-ink-950">تسجيل دخول الطالب</h1>
+        <p className="mb-6 mt-1 text-sm text-ink-600">ادخل برقم الجامعة وكلمة المرور.</p>
         <LoginForm />
-        <p className="mt-5 text-center text-xs text-slate-500">
+        <p className="mt-5 text-center text-xs text-ink-600">
           حسابك يُنشأ من إدارة الكلية — لا يوجد تسجيل ذاتي.
         </p>
         <p className="mt-3 text-center text-sm">
-          <Link href="/login" className="font-semibold text-indigo-700 hover:underline">
+          <Link href="/login" className="font-semibold text-brand-700 dark:text-brand-300 hover:underline">
             تغيير نوع الحساب
           </Link>
         </p>

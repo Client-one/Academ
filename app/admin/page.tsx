@@ -33,14 +33,14 @@ export default async function AdminOverviewPage() {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {cards.map((c) => (
           <Card key={c.label} className="border-t-4 border-t-brand-500 text-center">
-            <p className="bg-gradient-to-br from-brand-600 to-violet-600 bg-clip-text text-3xl font-extrabold text-transparent">{c.value}</p>
+            <p className="text-3xl font-extrabold text-brand-700 dark:text-brand-300">{c.value}</p>
             <CardTitle className="mt-1 text-sm">{c.label}</CardTitle>
           </Card>
         ))}
       </div>
 
       <div className="mt-6 flex flex-wrap gap-3">
-        <Link href="/admin/students" className="inline-flex min-h-[44px] items-center rounded-xl bg-gradient-to-br from-brand-600 to-brand-800 px-5 text-sm font-bold text-white shadow-sm hover:from-brand-700 hover:to-brand-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2">
+        <Link href="/admin/students" className="inline-flex min-h-[44px] items-center rounded-xl bg-brand-700 px-5 text-sm font-bold text-white shadow-sm hover:bg-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2">
           إضافة طالب
         </Link>
         <Link href="/admin/materials" className="inline-flex min-h-[44px] items-center rounded-xl border border-ink-300 bg-white px-5 text-sm font-bold text-ink-800 hover:bg-ink-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2">

@@ -27,8 +27,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#312e81" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b1120" },
+    { media: "(prefers-color-scheme: light)", color: "#275a4c" },
+    { media: "(prefers-color-scheme: dark)", color: "#141311" },
   ],
 };
 
@@ -42,7 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="min-h-screen bg-gradient-to-b from-brand-50/60 to-ink-50 bg-fixed font-sans text-ink-900 antialiased">
+      <body className="min-h-screen bg-ink-50 font-sans text-ink-900 antialiased">
         {children}
       </body>
     </html>
