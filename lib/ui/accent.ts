@@ -15,5 +15,5 @@ const ACCENTS = [
 export function courseAccent(id: string): string {
   let h = 0;
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
-  return ACCENTS[h % ACCENTS.length];
+  return ACCENTS[h % ACCENTS.length] ?? ACCENTS[0];
 }
