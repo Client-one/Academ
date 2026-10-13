@@ -1,3 +1,5 @@
+import { DeleteButton } from "@/components/delete-button";
+import { deleteEntityAction } from "@/app/admin/actions/deletions";
 import { ActionForm } from "@/components/action-form";
 import { MoveButtons } from "@/components/admin-table-actions";
 import { Input } from "@/components/ui/input";
@@ -29,10 +31,13 @@ export default async function AdminLevelsPage() {
             <li key={l.id} className="rounded-2xl border border-ink-200/70 bg-white p-3 shadow-card">
               <div className="flex items-center justify-between gap-2">
                 <span className="font-bold text-ink-900">{l.name}</span>
-                <MoveButtons kind="level" id={l.id} />
+                <span className="flex items-center gap-1">
+                  <MoveButtons kind="level" id={l.id} />
+                  <DeleteButton action={deleteEntityAction.bind(null, "level", l.id)} itemName={l.name} warning="يُحذف المستوى فقط إذا كان فارغًا من الفصول." />
+                </span>
               </div>
               <details className="mt-2">
-                <summary className="cursor-pointer text-sm font-semibold text-brand-700">
+                <summary className="cursor-pointer text-sm font-semibold text-brand-700 dark:text-brand-300">
                   تعديل المستوى
                 </summary>
                 <ActionForm action={upsertLevelAction} submitLabel="حفظ التعديل" className="mt-3">

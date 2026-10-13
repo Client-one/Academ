@@ -6,7 +6,7 @@ const tones: Record<Tone, string> = {
   draft: "bg-ink-100 text-ink-600 border-ink-300",
   archived: "bg-ink-200 text-ink-700 border-ink-300",
   published: "bg-emerald-100 text-emerald-900 border-emerald-300",
-  neutral: "bg-brand-50 text-brand-900 border-brand-200",
+  neutral: "bg-brand-50 text-brand-900 dark:text-brand-300 border-brand-200",
 };
 
 export function Badge({ tone, children }: { tone: Tone; children: React.ReactNode }) {

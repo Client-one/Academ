@@ -1,3 +1,5 @@
+import { DeleteButton } from "@/components/delete-button";
+import { deleteEntityAction } from "@/app/admin/actions/deletions";
 import { ActionForm } from "@/components/action-form";
 import { MoveButtons } from "@/components/admin-table-actions";
 import { Input } from "@/components/ui/input";
@@ -43,10 +45,13 @@ export default async function AdminSemestersPage() {
                 <span className="font-bold text-ink-900">
                   {s.name} <span className="text-sm font-normal text-ink-500">({s.level_name})</span>
                 </span>
-                <MoveButtons kind="semester" id={s.id} />
+                <span className="flex items-center gap-1">
+                  <MoveButtons kind="semester" id={s.id} />
+                  <DeleteButton action={deleteEntityAction.bind(null, "semester", s.id)} itemName={s.name} warning="يُحذف الفصل فقط إذا لم يحتوِ على مقررات أو طلاب." />
+                </span>
               </div>
               <details className="mt-2">
-                <summary className="cursor-pointer text-sm font-semibold text-brand-700">
+                <summary className="cursor-pointer text-sm font-semibold text-brand-700 dark:text-brand-300">
                   تعديل الفصل
                 </summary>
                 <ActionForm action={upsertSemesterAction} submitLabel="حفظ التعديل" className="mt-3">

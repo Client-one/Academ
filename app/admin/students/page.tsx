@@ -1,6 +1,9 @@
+import { DeleteButton } from "@/components/delete-button";
+import { deleteStudentAction } from "@/app/admin/actions/deletions";
 import { ActionForm } from "@/components/action-form";
 import { ConfirmButton } from "@/components/confirm-button";
 import { Alert } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -75,9 +78,9 @@ export default async function AdminStudentsPage({
       ) : students.length === 0 ? (
         <EmptyState title="لا يوجد طلاب" />
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-ink-200/70 bg-white shadow-card">
-          <table className="w-full min-w-[760px] text-sm">
-            <thead>
+        <div className="md:overflow-x-auto md:rounded-2xl md:border md:border-ink-200/70 md:bg-white md:shadow-card">
+          <table className="w-full text-sm md:min-w-[760px]">
+            <thead className="hidden md:table-header-group">
               <tr className="border-b border-ink-100 text-right text-ink-500">
                 <th className="p-3 font-semibold">الاسم</th>
                 <th className="p-3 font-semibold">رقم الجامعة</th>
@@ -86,14 +89,14 @@ export default async function AdminStudentsPage({
                 <th className="p-3 font-semibold">إجراءات</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="block md:table-row-group">
               {students.map((s) => (
-                <tr key={s.id} className="border-b border-ink-50 align-top">
-                  <td className="p-3 font-semibold text-ink-900">{s.full_name}</td>
-                  <td className="p-3" dir="ltr">{s.university_id}</td>
-                  <td className="p-3">{s.level_name} — {s.semester_name}</td>
-                  <td className="p-3">{s.is_active ? "نشط" : "معطّل"}</td>
-                  <td className="p-3">
+                <tr key={s.id} className="mb-3 block rounded-2xl border border-ink-200/70 bg-white p-4 align-top shadow-card md:mb-0 md:table-row md:rounded-none md:border-0 md:border-b md:border-ink-100 md:bg-transparent md:p-0 md:shadow-none">
+                  <td className="block py-1 font-semibold text-ink-900 md:table-cell md:p-3">{s.full_name}</td>
+                  <td className="block py-1 text-right md:table-cell md:p-3" dir="ltr" data-label="رقم الجامعة">{s.university_id}</td>
+                  <td className="block py-1 text-ink-600 md:table-cell md:p-3">{s.level_name} — {s.semester_name}</td>
+                  <td className="block py-1 md:table-cell md:p-3"><Badge tone={s.is_active ? "published" : "archived"}>{s.is_active ? "نشط" : "معطّل"}</Badge></td>
+                  <td className="block pt-3 md:table-cell md:p-3">
                     <div className="flex flex-wrap items-center gap-2">
                       <a href={`?edit=${s.id}`}><Button size="sm" variant="ghost">تعديل</Button></a>
                       <ConfirmButton
@@ -101,6 +104,11 @@ export default async function AdminStudentsPage({
                         confirmMessage={s.is_active ? "تعطيل الطالب وإنهاء جلساته فوراً؟" : "تفعيل الطالب؟"}
                         label={s.is_active ? "تعطيل" : "تفعيل"}
                         variant={s.is_active ? "danger" : "secondary"}
+                      />
+                      <DeleteButton
+                        action={deleteStudentAction.bind(null, s.id)}
+                        itemName={s.full_name}
+                        warning="سيُحذف حساب الطالب نهائيًا وتنتهي جلساته فورًا. إن كنت تريد إيقافه مؤقتًا فاستخدم «تعطيل» بدلًا من الحذف."
                       />
                       <ActionForm
                         action={resetStudentPasswordAction}

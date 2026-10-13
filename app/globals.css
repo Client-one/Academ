@@ -2,6 +2,78 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---- Theme tokens (light default, .dark override) ---- */
+:root {
+  --brand-50: 238 242 255;
+  --brand-100: 224 231 255;
+  --brand-200: 199 210 254;
+  --brand-300: 165 180 252;
+  --brand-400: 129 140 248;
+  --brand-500: 99 102 241;
+  --brand-600: 79 70 229;
+  --brand-700: 67 56 202;
+  --brand-800: 55 48 163;
+  --brand-900: 49 46 129;
+  --brand-950: 30 27 75;
+  --ink-50: 248 250 252;
+  --ink-100: 241 245 249;
+  --ink-200: 226 232 240;
+  --ink-300: 203 213 225;
+  --ink-400: 148 163 184;
+  --ink-500: 100 116 139;
+  --ink-600: 71 85 105;
+  --ink-700: 51 65 85;
+  --ink-800: 30 41 59;
+  --ink-900: 15 23 42;
+  --ink-950: 2 6 23;
+  --surface: 255 255 255;
+  color-scheme: light;
+}
+.dark {
+  --brand-50: 26 25 66;
+  --brand-100: 36 34 107;
+  --brand-200: 49 46 129;
+  --brand-300: 67 56 202;
+  --brand-400: 99 102 241;
+  --brand-500: 129 140 248;
+  --brand-600: 99 102 241;
+  --brand-700: 79 70 229;
+  --brand-800: 67 56 202;
+  --brand-900: 165 180 252;
+  --brand-950: 199 210 254;
+  --ink-50: 11 17 32;
+  --ink-100: 17 26 46;
+  --ink-200: 30 41 59;
+  --ink-300: 51 65 85;
+  --ink-400: 100 116 139;
+  --ink-500: 148 163 184;
+  --ink-600: 170 182 200;
+  --ink-700: 203 213 225;
+  --ink-800: 226 232 240;
+  --ink-900: 241 245 249;
+  --ink-950: 248 250 252;
+  --surface: 19 28 49;
+  color-scheme: dark;
+}
+
+/* Dark remaps for the default Tailwind slate/indigo/white utilities used by
+   the public pages and shared components. Scoped to .dark only. */
+.dark .bg-white { background-color: rgb(var(--surface)); }
+.dark .bg-white\/90 { background-color: rgb(11 17 32 / 0.9); }
+.dark .bg-white\/70 { background-color: rgb(19 28 49 / 0.7); }
+.dark .bg-slate-50 { background-color: rgb(11 17 32); }
+.dark .bg-slate-100 { background-color: rgb(30 41 59); }
+.dark .bg-slate-200 { background-color: rgb(51 65 85); }
+.dark .bg-indigo-50 { background-color: rgb(36 34 107); }
+.dark .text-slate-950, .dark .text-slate-900 { color: rgb(248 250 252); }
+.dark .text-slate-700, .dark .text-slate-600 { color: rgb(203 213 225); }
+.dark .text-slate-500, .dark .text-slate-400 { color: rgb(148 163 184); }
+.dark .text-indigo-700, .dark .text-indigo-800 { color: rgb(165 180 252); }
+.dark .border-slate-200, .dark .border-slate-200\/70, .dark .border-slate-100 { border-color: rgb(51 65 85); }
+.dark .hover\:bg-indigo-50:hover { background-color: rgb(36 34 107); }
+.dark .hover\:bg-slate-50:hover { background-color: rgb(30 41 59); }
+.dark .hover\:text-indigo-700:hover { color: rgb(199 210 254); }
+
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;
@@ -24,6 +96,22 @@
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
+    }
+  }
+}
+
+/* Scroll reveal: progressive enhancement. Browsers without scroll-driven
+   animations simply show the content; reduced-motion users never get it. */
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
     }
   }
 }

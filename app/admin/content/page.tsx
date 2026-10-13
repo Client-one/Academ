@@ -1,3 +1,5 @@
+import { DeleteButton } from "@/components/delete-button";
+import { deleteEntityAction } from "@/app/admin/actions/deletions";
 import { ActionForm } from "@/components/action-form";
 import { HierarchyNav } from "@/components/admin/hierarchy-nav";
 import { MoveButtons, StatusButtons } from "@/components/admin-table-actions";
@@ -71,10 +73,11 @@ export default async function AdminContentPage({
                     <span className="flex items-center gap-2">
                       <MoveButtons kind="content_item" id={i.id} />
                       <StatusButtons kind="content_item" id={i.id} status={i.status} />
+                      <DeleteButton action={deleteEntityAction.bind(null, "content_item", i.id)} itemName={i.title} warning="يُحذف المحور فقط إذا لم يحتوِ على مواد." />
                     </span>
                   </div>
                   <details className="mt-2">
-                    <summary className="cursor-pointer text-sm font-semibold text-brand-700">
+                    <summary className="cursor-pointer text-sm font-semibold text-brand-700 dark:text-brand-300">
                       تعديل المحور
                     </summary>
                     <ActionForm action={upsertContentItemAction} submitLabel="حفظ التعديل" className="mt-3">

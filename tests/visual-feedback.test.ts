@@ -68,8 +68,7 @@ describe("wiring", () => {
 
   it("navs and student pages use PendingLink; download link is untouched", () => {
     for (const f of [
-      "components/admin-nav.tsx",
-      "components/student-nav.tsx",
+      "components/nav-links.tsx",
       "app/(student)/dashboard/page.tsx",
       "app/(student)/courses/page.tsx",
       "app/(student)/courses/[courseId]/page.tsx",

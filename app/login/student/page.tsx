@@ -25,7 +25,7 @@ export default async function StudentLoginPage() {
         <h1 className="text-2xl font-extrabold text-slate-950">تسجيل دخول الطالب</h1>
         <p className="mb-6 mt-1 text-sm text-slate-500">ادخل برقم الجامعة وكلمة المرور.</p>
         <LoginForm />
-        <p className="mt-5 text-center text-xs text-slate-400">
+        <p className="mt-5 text-center text-xs text-slate-500">
           حسابك يُنشأ من إدارة الكلية — لا يوجد تسجيل ذاتي.
         </p>
         <p className="mt-3 text-center text-sm">

@@ -1,3 +1,5 @@
+import { DeleteButton } from "@/components/delete-button";
+import { deleteEntityAction } from "@/app/admin/actions/deletions";
 import { ActionForm } from "@/components/action-form";
 import { HierarchyNav } from "@/components/admin/hierarchy-nav";
 import { MoveButtons, StatusButtons } from "@/components/admin-table-actions";
@@ -103,11 +105,12 @@ export default async function AdminMaterialsPage({
                     <span className="flex items-center gap-2">
                       <MoveButtons kind="material" id={m.id} />
                       <StatusButtons kind="material" id={m.id} status={m.status} />
+                      <DeleteButton action={deleteEntityAction.bind(null, "material", m.id)} itemName={m.title} warning="سيُحذف سجل المادة وملفها نهائيًا، ولن يراها الطلاب بعد ذلك." />
                     </span>
                   </div>
 
                   <details className="mt-3">
-                    <summary className="cursor-pointer text-sm font-semibold text-brand-700">
+                    <summary className="cursor-pointer text-sm font-semibold text-brand-700 dark:text-brand-300">
                       تعديل المادة
                     </summary>
                     <ActionForm action={updateMaterialAction} submitLabel="حفظ التعديل" className="mt-3">
@@ -124,7 +127,7 @@ export default async function AdminMaterialsPage({
                   </details>
 
                   <details className="mt-3">
-                    <summary className="cursor-pointer text-sm font-semibold text-brand-700">
+                    <summary className="cursor-pointer text-sm font-semibold text-brand-700 dark:text-brand-300">
                       إرفاق نسخة قراءة (مقال JSON)
                     </summary>
                     <ActionForm action={attachArticleAction} submitLabel="التحقق والحفظ" className="mt-3">

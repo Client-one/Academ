@@ -130,3 +130,13 @@ Upload order: the file is uploaded to Storage first, then the
 needed; the table has no DELETE policy). If the insert fails the object is
 removed and the removal is verified; an object that cannot be removed is logged
 as `material_orphan_file_cleanup_failed` for manual cleanup.
+
+## Migration 0006 — admin delete (required for the delete buttons)
+
+Run `supabase/migrations/0006_admin_delete.sql` in the SQL Editor after 0005.
+It adds admin-only DELETE policies for levels, semesters, courses, content
+items and materials. Without it the delete buttons report that nothing was
+deleted. Foreign keys stay `ON DELETE RESTRICT`, so a non-empty level,
+semester, course or content item cannot be removed until it is emptied.
+Students are deleted through the Auth Admin API (profile follows by cascade);
+material files are removed from Storage together with the row.

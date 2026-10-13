@@ -2,8 +2,8 @@ import { PendingLink } from "@/components/pending-link";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
-import { PageHeader } from "@/components/ui/page-header";
 import { listContentItems } from "@/lib/data/academics";
+import { courseAccent } from "@/lib/ui/accent";
 import { requireStudent } from "@/lib/security/guards";
 
 export default async function CoursePage({
@@ -28,10 +28,14 @@ export default async function CoursePage({
 
   return (
     <>
-      <PageHeader
-        title={(course as { name: string }).name}
-        subtitle={`رمز المقرر: ${(course as { code: string }).code}`}
-      />
+      <section className={`relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-br ${courseAccent(courseId)} p-6 text-white shadow-lift sm:p-8`}>
+        <div aria-hidden className="pointer-events-none absolute -bottom-16 end-4 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
+        <p className="relative text-sm font-semibold text-white/95" dir="ltr">
+          {(course as { code: string }).code}
+        </p>
+        <h1 className="relative mt-1 text-2xl font-extrabold sm:text-3xl">{(course as { name: string }).name}</h1>
+        <p className="relative mt-2 text-sm text-white/95">{published.length} محور منشور</p>
+      </section>
       {published.length === 0 ? (
         <EmptyState title="لم تُنشر محاور بعد" hint="ستُضاف محاور المقرر هنا فور اعتمادها." />
       ) : (

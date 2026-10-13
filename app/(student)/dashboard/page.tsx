@@ -1,6 +1,9 @@
 import { PendingLink } from "@/components/pending-link";
 import { redirect } from "next/navigation";
 import { BookIcon } from "@/components/public/icons";
+import { ContinueCard } from "@/components/continue-card";
+import { Highlight } from "@/components/highlight";
+import { courseAccent } from "@/lib/ui/accent";
 import { Card, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
@@ -57,6 +60,8 @@ export default async function DashboardPage({
         </div>
       </section>
 
+      {!hasQuery && <ContinueCard />}
+
       {hasQuery && (
         <section className="mb-8">
           {search.success === false && (
@@ -70,14 +75,14 @@ export default async function DashboardPage({
               {results.courses.map((c) => (
                 <PendingLink indicator="corner" key={c.id} href={`/courses/${c.id}`}
                   className="block rounded-xl border border-ink-100 bg-white p-3 shadow-card hover:border-brand-300 hover:shadow-lift">
-                  <span className="font-bold text-ink-900">{c.name}</span>
+                  <span className="font-bold text-ink-900"><Highlight text={c.name} query={q} /></span>
                   <span className="mr-2 text-xs text-ink-500" dir="ltr">{c.code}</span>
                 </PendingLink>
               ))}
               {results.contentItems.map((i) => (
                 <PendingLink indicator="corner" key={i.id} href={`/courses/${i.course_id}/${i.id}`}
                   className="block rounded-xl border border-ink-100 bg-white p-3 shadow-card hover:border-brand-300">
-                  <span className="font-bold text-ink-900">{i.title}</span>
+                  <span className="font-bold text-ink-900"><Highlight text={i.title} query={q} /></span>
                   <span className="mr-2 text-xs text-ink-500">عنوان محتوى</span>
                 </PendingLink>
               ))}
@@ -85,7 +90,7 @@ export default async function DashboardPage({
                 <div key={m.id}
                   className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-ink-100 bg-white p-3 shadow-card">
                   <span>
-                    <span className="font-bold text-ink-900">{m.title}</span>
+                    <span className="font-bold text-ink-900"><Highlight text={m.title} query={q} /></span>
                     <span className="mr-2 text-xs text-ink-500">
                       {MATERIAL_KIND_META[m.kind_code ?? ""]?.label ?? "مادة"}
                     </span>
@@ -111,7 +116,7 @@ export default async function DashboardPage({
             {courses.map((course) => (
               <PendingLink indicator="corner" key={course.id} href={`/courses/${course.id}`}>
                 <Card className="group h-full transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-lift motion-reduce:transition-none motion-reduce:hover:translate-y-0">
-                  <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-violet-600 text-white">
+                  <span className={`mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${courseAccent(course.id)} text-white`}>
                     <BookIcon className="h-5 w-5" />
                   </span>
                   <CardTitle className="text-lg">{course.name}</CardTitle>

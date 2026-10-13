@@ -44,7 +44,7 @@ function Block({ block }: { block: ArticleBlock }) {
     case "definition":
       return (
         <dl className="rounded-xl border border-brand-200 bg-brand-50 p-4">
-          <dt className="font-bold text-brand-900">{block.term}</dt>
+          <dt className="font-bold text-brand-900 dark:text-brand-300">{block.term}</dt>
           <dd className="mt-1 leading-7 text-ink-800">{block.definition}</dd>
         </dl>
       );
