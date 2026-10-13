@@ -1,6 +1,7 @@
 import { Brand } from "@/components/public/brand";
 import { NavLinks } from "./nav-links";
 import { LogoutButton } from "./logout-button";
+import { ThemeToggle } from "./theme-toggle";
 
 const links = [
   { href: "/admin", label: "نظرة عامة" },
@@ -25,6 +26,7 @@ export function AdminNav({ adminName }: { adminName: string }) {
           </div>
           <div className="flex items-center gap-3">
             <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">{adminName}</span>
+            <ThemeToggle className="!h-9 !w-9 !border-white/20 !text-brand-100 hover:!bg-white/10" />
             <LogoutButton onDark />
           </div>
         </div>

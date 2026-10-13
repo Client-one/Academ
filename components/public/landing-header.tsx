@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Brand } from "./brand";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { CloseIcon, MenuIcon } from "./icons";
 
 const links = [
@@ -39,6 +40,7 @@ export function LandingHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <Link
             href="/login"
             className="inline-flex min-h-[44px] items-center rounded-xl bg-indigo-700 px-5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-indigo-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"

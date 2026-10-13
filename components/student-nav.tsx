@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Brand } from "@/components/public/brand";
 import { NavLinks } from "./nav-links";
 import { LogoutButton } from "./logout-button";
+import { ThemeToggle } from "./theme-toggle";
 
 const items = [
   { href: "/dashboard", label: "الرئيسية" },
@@ -37,6 +38,7 @@ export async function StudentNav() {
               {level?.name ?? ""} — {semester?.name ?? ""}
             </p>
           </div>
+          <ThemeToggle className="!h-9 !w-9" />
           <LogoutButton />
         </div>
       </div>
